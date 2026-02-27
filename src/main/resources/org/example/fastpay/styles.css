@@ -1,0 +1,58 @@
+.root-pane {
+    -fx-background-color: white;
+}
+.brand-panel {
+    -fx-background-color: #000080; /* Navy Blue */
+    -fx-padding: 40;
+    -fx-spacing: 20;
+}
+.brand-title {
+    -fx-text-fill: white;
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 0 0;
+}
+.brand-subtitle {
+    -fx-text-fill: #cccccc;
+    -fx-font-size: 14px;
+}
+.login-panel {
+    -fx-background-color: white;
+    -fx-padding: 50;
+}
+.form-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+    -fx-padding: 0 0 20 0;
+}
+.input-label {
+    -fx-text-fill: #666666;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+.input-field {
+    -fx-pref-height: 40px;
+    -fx-background-radius: 5;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 5;
+    -fx-border-width: 1;
+    -fx-background-color: #f9f9f9;
+    -fx-padding: 0 10 0 10;
+}
+.input-field:focused {
+    -fx-border-color: #000080;
+    -fx-background-color: white;
+}
+.primary-button {
+    -fx-background-color: #000080;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+.primary-button:hover {
+    -fx-background-color: #000066;
+}
+
