@@ -7,16 +7,17 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
 public class RegisterController {
+    @FXML private TextField usernameInput;
     @FXML private TextField nameInput;
     @FXML private TextField cnicInput;
     @FXML private TextField phoneInput;
     @FXML private PasswordField passwordInput;
     @FXML private Label errorLabel;
 
+    @FXML private Label userAsterisk;
     @FXML private Label nameAsterisk;
     @FXML private Label cnicAsterisk;
     @FXML private Label phoneAsterisk;
@@ -24,32 +25,45 @@ public class RegisterController {
 
     @FXML
     protected void handleRegisterSubmit() {
-        boolean isNameEmpty = nameInput.getText().trim().isEmpty();
-        boolean isCnicEmpty = cnicInput.getText().trim().isEmpty();
-        boolean isPhoneEmpty = phoneInput.getText().trim().isEmpty();
-        boolean isPassEmpty = passwordInput.getText().trim().isEmpty();
+        String username = usernameInput.getText().trim();
+        String name = nameInput.getText().trim();
+        String cnic = cnicInput.getText().trim();
+        String phone = phoneInput.getText().trim();
+        String pass = passwordInput.getText().trim();
 
-        nameAsterisk.setVisible(isNameEmpty);
-        cnicAsterisk.setVisible(isCnicEmpty);
-        phoneAsterisk.setVisible(isPhoneEmpty);
-        passAsterisk.setVisible(isPassEmpty);
+        userAsterisk.setVisible(username.isEmpty());
+        nameAsterisk.setVisible(name.isEmpty());
+        cnicAsterisk.setVisible(cnic.isEmpty());
+        phoneAsterisk.setVisible(phone.isEmpty());
+        passAsterisk.setVisible(pass.isEmpty());
 
-        if (isNameEmpty || isCnicEmpty || isPhoneEmpty || isPassEmpty) {
+        if (username.isEmpty() || name.isEmpty() || cnic.isEmpty() || phone.isEmpty() || pass.isEmpty()) {
             errorLabel.setText("Please fill in all required fields.");
             errorLabel.setStyle("-fx-text-fill: red;");
-        } else {
-            errorLabel.setText("Registration valid! Ready for Supabase.");
+            return;
+        }
+
+        errorLabel.setText("Creating account...");
+        errorLabel.setStyle("-fx-text-fill: #002244;");
+
+        // Send to Live Database
+        String response = SupabaseAuth.registerUser(username, name, cnic, phone, pass);
+
+        if (response.equals("Success")) {
+            errorLabel.setText("Account Created! You can now log in.");
             errorLabel.setStyle("-fx-text-fill: green;");
+            // Clear fields after success
+            usernameInput.clear(); nameInput.clear(); cnicInput.clear(); phoneInput.clear(); passwordInput.clear();
+        } else {
+            errorLabel.setText(response);
+            errorLabel.setStyle("-fx-text-fill: red;");
         }
     }
 
     @FXML
     protected void goToLogin() throws IOException {
-        // Load the Login screen
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("login-view.fxml"));
         Stage stage = (Stage) errorLabel.getScene().getWindow();
-
-        // Keep the current window size during the switch
         Scene scene = new Scene(fxmlLoader.load(), stage.getScene().getWidth(), stage.getScene().getHeight());
         stage.setScene(scene);
     }

@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@700&display=swap');
+
 .root-pane {
     -fx-background-color: white;
+    -fx-font-family: 'Inter', sans-serif;
 }
 .brand-panel {
-    -fx-background-color: #000080; /* Navy Blue */
+    -fx-background-color: #002244; /* Navy Blue */
     -fx-padding: 40;
     -fx-spacing: 20;
 }
@@ -10,11 +13,13 @@
     -fx-text-fill: white;
     -fx-font-size: 36px;
     -fx-font-weight: bold;
+    -fx-font-family: 'Montserrat', sans-serif;
     -fx-padding: 10 0 0 0;
 }
 .brand-subtitle {
     -fx-text-fill: #cccccc;
     -fx-font-size: 14px;
+    -fx-font-family: 'Montserrat', sans-serif;
 }
 .login-panel {
     -fx-background-color: white;
@@ -25,6 +30,7 @@
     -fx-font-weight: bold;
     -fx-text-fill: #333333;
     -fx-padding: 0 0 20 0;
+    -fx-font-family: 'Montserrat', sans-serif;
 }
 .input-label {
     -fx-text-fill: #666666;
@@ -41,11 +47,11 @@
     -fx-padding: 0 10 0 10;
 }
 .input-field:focused {
-    -fx-border-color: #000080;
+    -fx-border-color: #002244;
     -fx-background-color: white;
 }
 .primary-button {
-    -fx-background-color: #000080;
+    -fx-background-color: #002244;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
@@ -53,6 +59,8 @@
     -fx-cursor: hand;
 }
 .primary-button:hover {
-    -fx-background-color: #000066;
+    -fx-background-color: #00152b; /* Perfectly matched darker hover */
 }
-
+.hyperlink {
+    -fx-text-fill: #002244;
+}

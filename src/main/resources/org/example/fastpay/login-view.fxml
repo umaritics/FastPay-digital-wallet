@@ -23,10 +23,10 @@
 
         <VBox spacing="5" maxWidth="350">
             <HBox spacing="2">
-                <Label text="Phone Number" styleClass="input-label"/>
-                <Label fx:id="phoneAsterisk" text="*" textFill="RED" visible="false" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+                <Label text="Username" styleClass="input-label"/>
+                <Label fx:id="userAsterisk" text="*" textFill="RED" visible="false" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
             </HBox>
-            <TextField fx:id="phoneInput" promptText="03XX-XXXXXXX" styleClass="input-field"/>
+            <TextField fx:id="usernameInput" promptText="e.g. usman123" styleClass="input-field"/>
         </VBox>
 
         <VBox spacing="5" maxWidth="350">

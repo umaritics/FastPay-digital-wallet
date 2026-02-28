@@ -20,6 +20,14 @@
 
         <VBox spacing="5" maxWidth="350">
             <HBox spacing="2">
+                <Label text="Username" styleClass="input-label"/>
+                <Label fx:id="userAsterisk" text="*" textFill="RED" visible="false" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+            </HBox>
+            <TextField fx:id="usernameInput" promptText="Unique Username" styleClass="input-field"/>
+        </VBox>
+
+        <VBox spacing="5" maxWidth="350">
+            <HBox spacing="2">
                 <Label text="Full Name" styleClass="input-label"/>
                 <Label fx:id="nameAsterisk" text="*" textFill="RED" visible="false" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
             </HBox>
