@@ -6,5 +6,6 @@ module org.example.fastpay {
 
 
     opens org.example.fastpay to javafx.fxml;
+    opens org.example.fastpay.controllers to javafx.fxml;
     exports org.example.fastpay;
 }
