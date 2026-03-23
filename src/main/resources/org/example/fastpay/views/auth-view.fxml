@@ -12,77 +12,80 @@
 
     <HBox alignment="CENTER" maxWidth="850.0" maxHeight="600.0" spacing="60.0">
 
-        <VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="420.0" spacing="15.0" style="-fx-background-color: #1A2130; -fx-background-radius: 20;">            <effect>
+        <VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="420.0" style="-fx-background-color: #1A2130; -fx-background-radius: 20;">
+            <effect>
                 <DropShadow color="#0000004d" offsetY="10.0" radius="20.0" spread="0.05" />
             </effect>
-            <padding>
-                <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
-            </padding>
 
-            <ImageView fitHeight="80.0" fitWidth="80.0" pickOnBounds="true" preserveRatio="true">
-                <clip>
-                    <Rectangle width="80.0" height="80.0" arcWidth="25.0" arcHeight="25.0" />
-                </clip>
-                <Image url="@../assets/fastpay-logo-whitebg.png" />
-            </ImageView>
+            <StackPane prefHeight="100.0" style="-fx-background-color: white; -fx-background-radius: 20 20 0 0;">
+                <ImageView fitHeight="90.0" fitWidth="180.0" pickOnBounds="true" preserveRatio="true">
+                    <Image url="@../assets/fastpay-logo.png" />
+                </ImageView>
+            </StackPane>
 
-            <Label text="Welcome to FastPay" textFill="WHITE">
-                <font>
-                    <Font name="System Bold" size="24.0" />
-                </font>
-            </Label>
+            <VBox alignment="TOP_CENTER" spacing="15.0" VBox.vgrow="ALWAYS">
+                <padding>
+                    <Insets bottom="40.0" left="40.0" right="40.0" top="20.0" />
+                </padding>
 
-            <TabPane fx:id="authTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-                <Tab fx:id="loginTab" text="Sign In">
-                    <VBox alignment="CENTER_LEFT" spacing="18.0">
-                        <padding>
-                            <Insets top="20.0" />
-                        </padding>
+                <Label text="Welcome" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                </Label>
 
-                        <VBox spacing="5.0">
-                            <Label text="Email" textFill="#b0b8c4" />
-                            <TextField fx:id="loginEmailInput" promptText="Enter your email" styleClass="input-field" />
+                <TabPane fx:id="authTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                    <Tab fx:id="loginTab" text="Sign In">
+                        <VBox alignment="CENTER_LEFT" spacing="18.0">
+                            <padding>
+                                <Insets top="20.0" />
+                            </padding>
+
+                            <VBox spacing="5.0">
+                                <Label text="Email" textFill="#b0b8c4" />
+                                <TextField fx:id="loginEmailInput" promptText="Enter your email" styleClass="input-field" />
+                            </VBox>
+
+                            <VBox spacing="5.0">
+                                <Label text="Password" textFill="#b0b8c4" />
+                                <PasswordField fx:id="loginPasswordInput" promptText="Enter your password" styleClass="input-field" />
+                            </VBox>
+
+                            <Label fx:id="loginErrorLabel" textFill="#ff6b6b" wrapText="true" />
+
+                            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#handleLogin" styleClass="primary-btn" text="Login" />
+
+                            <HBox alignment="CENTER">
+                                <Label text="Don't have an account? " textFill="#b0b8c4" />
+                                <Hyperlink onAction="#switchToRegisterTab" text="Sign up here" textFill="#4da6ff" />
+                            </HBox>
                         </VBox>
+                    </Tab>
 
-                        <VBox spacing="5.0">
-                            <Label text="Password" textFill="#b0b8c4" />
-                            <PasswordField fx:id="loginPasswordInput" promptText="Enter your password" styleClass="input-field" />
+                    <Tab fx:id="registerTab" text="Sign Up">
+                        <VBox alignment="CENTER_LEFT" spacing="12.0">
+                            <padding>
+                                <Insets top="15.0" />
+                            </padding>
+
+                            <TextField fx:id="regNameInput" promptText="Full Name" styleClass="input-field" />
+                            <TextField fx:id="regEmailInput" promptText="Email Address" styleClass="input-field" />
+                            <TextField fx:id="regCnicInput" promptText="CNIC (e.g. 12345-1234567-1)" styleClass="input-field" />
+                            <TextField fx:id="regPhoneInput" promptText="Phone Number" styleClass="input-field" />
+                            <PasswordField fx:id="regPasswordInput" promptText="Create Password" styleClass="input-field" />
+
+                            <Label fx:id="regErrorLabel" textFill="#ff6b6b" wrapText="true" />
+
+                            <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#handleRegister" styleClass="primary-btn" text="Create Account" />
+
+                            <HBox alignment="CENTER">
+                                <Label text="Already have an account? " textFill="#b0b8c4" />
+                                <Hyperlink onAction="#switchToLoginTab" text="Log in" textFill="#4da6ff" />
+                            </HBox>
                         </VBox>
-
-                        <Label fx:id="loginErrorLabel" textFill="#ff6b6b" wrapText="true" />
-
-                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#handleLogin" styleClass="primary-btn" text="Login" />
-
-                        <HBox alignment="CENTER">
-                            <Label text="Don't have an account? " textFill="#b0b8c4" />
-                            <Hyperlink onAction="#switchToRegisterTab" text="Sign up here" textFill="#4da6ff" />
-                        </HBox>
-                    </VBox>
-                </Tab>
-
-                <Tab fx:id="registerTab" text="Sign Up">
-                    <VBox alignment="CENTER_LEFT" spacing="12.0">
-                        <padding>
-                            <Insets top="15.0" />
-                        </padding>
-
-                        <TextField fx:id="regNameInput" promptText="Full Name" styleClass="input-field" />
-                        <TextField fx:id="regEmailInput" promptText="Email Address" styleClass="input-field" />
-                        <TextField fx:id="regCnicInput" promptText="CNIC (e.g. 12345-1234567-1)" styleClass="input-field" />
-                        <TextField fx:id="regPhoneInput" promptText="Phone Number" styleClass="input-field" />
-                        <PasswordField fx:id="regPasswordInput" promptText="Create Password" styleClass="input-field" />
-
-                        <Label fx:id="regErrorLabel" textFill="#ff6b6b" wrapText="true" />
-
-                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#handleRegister" styleClass="primary-btn" text="Create Account" />
-
-                        <HBox alignment="CENTER">
-                            <Label text="Already have an account? " textFill="#b0b8c4" />
-                            <Hyperlink onAction="#switchToLoginTab" text="Log in" textFill="#4da6ff" />
-                        </HBox>
-                    </VBox>
-                </Tab>
-            </TabPane>
+                    </Tab>
+                </TabPane>
+            </VBox>
         </VBox>
 
         <VBox alignment="CENTER_LEFT" prefWidth="350.0">

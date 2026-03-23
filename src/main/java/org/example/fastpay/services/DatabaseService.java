@@ -8,8 +8,13 @@ import java.net.http.HttpResponse;
 
 public class DatabaseService {
 
-    private static final String SUPABASE_URL = "https://kkmcepagifexhdeodyog.supabase.co/rest/v1/users";
+    // FIXED: The base URL should only be the domain name
+    private static final String SUPABASE_URL = "https://kkmcepagifexhdeodyog.supabase.co";
+
+    // NOTE: Make sure this is your 'anon public' key from Supabase Settings -> API.
+    // Standard Supabase anon keys usually start with "eyJ...".
     private static final String API_KEY = "sb_publishable_Ebi_9rInKDfL_vP1i3IWvg_BnMUUWFY";
+
     private static final HttpClient client = HttpClient.newHttpClient();
 
     // REGISTER USING SUPABASE GOTRUE AUTH
@@ -41,7 +46,7 @@ public class DatabaseService {
                 return "Success";
             } else {
                 JSONObject errorObj = new JSONObject(response.body());
-                return "Registration Error: " + errorObj.optString("msg", "Unknown error occurred.");
+                return "Registration Error: " + errorObj.optString("msg", errorObj.optString("error_description", "Unknown error occurred."));
             }
         } catch (Exception e) {
             return "Connection error: " + e.getMessage();
@@ -66,7 +71,6 @@ public class DatabaseService {
 
             if (response.statusCode() == 200) {
                 JSONObject jsonResponse = new JSONObject(response.body());
-                // Extract role from user metadata if you need it for routing
                 JSONObject userObj = jsonResponse.getJSONObject("user");
                 JSONObject metadata = userObj.getJSONObject("user_metadata");
                 String role = metadata.optString("role", "user");
