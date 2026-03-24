@@ -29,3 +29,37 @@
 .primary-btn:hover {
     -fx-background-color: #3385ff;
 }
+
+/*Dashboard Styles*/
+/* Sidebar Buttons */
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #b0b8c4;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: BASELINE_LEFT;
+    -fx-padding: 10 15 10 15;
+    -fx-cursor: hand;
+}
+
+.sidebar-btn:hover {
+    -fx-background-color: #2b3648;
+    -fx-text-fill: white;
+    -fx-background-radius: 8px;
+}
+
+.sidebar-btn-logout {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ff6b6b;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: BASELINE_LEFT;
+    -fx-padding: 10 15 10 15;
+    -fx-cursor: hand;
+}
+
+.sidebar-btn-logout:hover {
+    -fx-background-color: #ffcccc;
+    -fx-text-fill: #cc0000;
+    -fx-background-radius: 8px;
+}
