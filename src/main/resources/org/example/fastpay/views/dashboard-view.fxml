@@ -3,109 +3,133 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="700.0" prefWidth="1050.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.fastpay.controllers.DashboardController">
+<StackPane prefHeight="750.0" prefWidth="1100.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.fastpay.controllers.DashboardController">
 
-    <left>
-        <VBox prefWidth="220.0" spacing="10.0" style="-fx-background-color: #1A2130;" BorderPane.alignment="CENTER">
-            <padding>
-                <Insets bottom="20.0" left="15.0" right="15.0" top="40.0" />
-            </padding>
-            <Label text="FASTPAY" textFill="WHITE">
-                <font>
-                    <Font name="System Bold" size="24.0" />
-                </font>
-                <VBox.margin>
-                    <Insets bottom="30.0" left="10.0" />
-                </VBox.margin>
-            </Label>
-
-            <Button maxWidth="Infinity" styleClass="sidebar-btn" text="Dashboard" />
-            <Button maxWidth="Infinity" styleClass="sidebar-btn" text="Send Money" />
-            <Button maxWidth="Infinity" styleClass="sidebar-btn" text="Transactions" />
-            <Button maxWidth="Infinity" styleClass="sidebar-btn" text="Analytics" />
-
-            <Region VBox.vgrow="ALWAYS" />
-            <Button maxWidth="Infinity" onAction="#handleLogout" styleClass="sidebar-btn-logout" text="Log Out" />
-        </VBox>
-    </left>
-
-    <center>
-        <ScrollPane fitToWidth="true" style="-fx-background-color: #f4f7f9;" BorderPane.alignment="CENTER">
-            <VBox spacing="30.0">
+    <BorderPane>
+        <left>
+            <VBox alignment="TOP_CENTER" prefWidth="80.0" spacing="20.0" style="-fx-background-color: #1A2130;" BorderPane.alignment="CENTER">
                 <padding>
-                    <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+                    <Insets bottom="20.0" top="30.0" />
                 </padding>
 
-                <HBox alignment="CENTER_LEFT" spacing="20.0">
-                    <Label fx:id="greetingLabel" text="Hello, User 👋" textFill="#1a2130">
-                        <font>
-                            <Font name="System Bold" size="28.0" />
-                        </font>
-                    </Label>
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Button onAction="#openCreatePartitionDialog" styleClass="primary-btn" text="+ New Partition" />
-                </HBox>
+                <Button styleClass="sidebar-icon-btn">
+                    <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-home.png" /></ImageView></graphic>
+                    <tooltip><Tooltip text="Home" /></tooltip>
+                </Button>
+                <Button styleClass="sidebar-icon-btn">
+                    <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-profile.png" /></ImageView></graphic>
+                    <tooltip><Tooltip text="Profile" /></tooltip>
+                </Button>
+                <Button styleClass="sidebar-icon-btn">
+                    <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-history.png" /></ImageView></graphic>
+                    <tooltip><Tooltip text="History" /></tooltip>
+                </Button>
+                <Button styleClass="sidebar-icon-btn">
+                    <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-settings.png" /></ImageView></graphic>
+                    <tooltip><Tooltip text="Settings" /></tooltip>
+                </Button>
 
-                <VBox prefHeight="220.0" style="-fx-background-color: linear-gradient(to bottom right, #a0c4d9, #e0f2fe); -fx-background-radius: 15;">
-                    <effect>
-                        <DropShadow color="#00000026" offsetY="5.0" radius="10.0" spread="0.0" />
-                    </effect>
+                <Region VBox.vgrow="ALWAYS" />
+                <Button onAction="#handleLogout" styleClass="sidebar-icon-btn">
+                    <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-logout.png" /></ImageView></graphic>
+                    <tooltip><Tooltip text="Log Out" /></tooltip>
+                </Button>
+            </VBox>
+        </left>
+
+        <center>
+            <ScrollPane fitToWidth="true" style="-fx-background-color: #f4f7f9; -fx-background: #f4f7f9;" BorderPane.alignment="CENTER">
+                <VBox spacing="10.0">
                     <padding>
-                        <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
+                        <Insets bottom="40.0" left="50.0" right="50.0" top="40.0" />
                     </padding>
 
-                    <Label text="Total Wallet Balance" textFill="#4a5568" />
-                    <Label fx:id="totalBalanceLabel" text="Rs. 0.00" textFill="#1a2130">
-                        <font>
-                            <Font name="System Bold" size="36.0" />
-                        </font>
-                    </Label>
-
-                    <Separator style="-fx-opacity: 0.3;">
-                        <VBox.margin>
-                            <Insets bottom="15.0" top="15.0" />
-                        </VBox.margin>
-                    </Separator>
-
-                    <HBox spacing="15.0">
-                        <VBox prefWidth="150.0" style="-fx-background-color: white; -fx-background-radius: 10;" HBox.hgrow="NEVER">
-                            <padding>
-                                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                            </padding>
-                            <Label text="General" textFill="#4a5568">
-                                <font>
-                                    <Font name="System Bold" size="14.0" />
-                                </font>
-                            </Label>
-                            <Label fx:id="generalBalanceLabel" text="Rs. 0.00" textFill="#1a2130" />
-                        </VBox>
-
-                        <ScrollPane fitToHeight="true" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER" HBox.hgrow="ALWAYS">
-                            <HBox fx:id="partitionsContainer" spacing="15.0">
-                            </HBox>
-                        </ScrollPane>
+                    <HBox alignment="CENTER">
+                        <ImageView fitHeight="50.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../assets/fastpay-logo.png" />
+                        </ImageView>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="greetingLabel" text="Hello, User 👋" textFill="#1a2130">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                        </Label>
                     </HBox>
-                </VBox>
 
-                <VBox spacing="15.0">
-                    <Label text="Recent Activity" textFill="#1a2130">
-                        <font>
-                            <Font name="System Bold" size="20.0" />
-                        </font>
-                    </Label>
-                    <TableView fx:id="transactionsTable" prefHeight="250.0">
-                        <columns>
-                            <TableColumn text="Date" prefWidth="150.0" />
-                            <TableColumn text="Description" prefWidth="250.0" />
-                            <TableColumn text="Partition Used" prefWidth="150.0" />
-                            <TableColumn text="Amount" prefWidth="150.0" />
-                        </columns>
-                    </TableView>
+                    <VBox prefHeight="220.0" style="-fx-background-color: linear-gradient(to bottom right, #a0c4d9, #e0f2fe); -fx-background-radius: 15;">
+                        <effect>
+                            <DropShadow color="#00000026" offsetY="5.0" radius="10.0" spread="0.0" />
+                        </effect>
+                        <padding>
+                            <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
+                        </padding>
+
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label text="Total Wallet Balance:" textFill="#4a5568" />
+                            <Label fx:id="totalBalanceLabel" text="Rs. 0.00" textFill="#4a5568">
+                                <font><Font name="System Bold" size="14.0" /></font>
+                            </Label>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Button fx:id="toggleBalanceBtn" style="-fx-background-color: transparent; -fx-cursor: hand;">
+                                <graphic><ImageView fitHeight="20.0" fitWidth="20.0"><Image url="@../assets/icon-eye.png" /></ImageView></graphic>
+                            </Button>
+                        </HBox>
+
+                        <Label text="General Partition" textFill="#4a5568">
+                            <VBox.margin><Insets top="15.0" /></VBox.margin>
+                        </Label>
+                        <Label fx:id="generalBalanceLabel" text="Rs. 0.00" textFill="#1a2130">
+                            <font><Font name="System Bold" size="42.0" /></font>
+                        </Label>
+
+                        <Separator style="-fx-opacity: 0.3;">
+                            <VBox.margin><Insets bottom="15.0" top="15.0" /></VBox.margin>
+                        </Separator>
+
+                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                            <Label text="Other Partitions:" textFill="#4a5568" />
+                            <ScrollPane fitToHeight="true" minHeight="90.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER" HBox.hgrow="ALWAYS">
+                                <HBox fx:id="partitionsContainer" spacing="15.0">
+                                    <padding><Insets bottom="10.0" top="5.0" right="10.0" left="5.0"/></padding>
+                                </HBox>
+                            </ScrollPane>
+                            <Button onAction="#openCreatePartitionDialog" styleClass="primary-btn" text="+ New Partition" />
+                        </HBox>
+                    </VBox>
+
+                    <HBox spacing="20.0" alignment="CENTER">
+                        <Button styleClass="quick-action-card" text="Add Money" prefWidth="130.0" prefHeight="130.0">
+                            <graphic><ImageView fitHeight="35.0" fitWidth="35.0"><Image url="@../assets/icon-add.png" /></ImageView></graphic>
+                        </Button>
+                        <Button styleClass="quick-action-card" text="Send Money" prefWidth="130.0" prefHeight="130.0">
+                            <graphic><ImageView fitHeight="35.0" fitWidth="35.0"><Image url="@../assets/icon-send.png" /></ImageView></graphic>
+                        </Button>
+                        <Button styleClass="quick-action-card" text="QuickPay" prefWidth="130.0" prefHeight="130.0">
+                            <graphic><ImageView fitHeight="35.0" fitWidth="35.0"><Image url="@../assets/icon-qr.png" /></ImageView></graphic>
+                        </Button>
+                        <Button styleClass="quick-action-card" text="Raast" prefWidth="130.0" prefHeight="130.0">
+                            <graphic><ImageView fitHeight="35.0" fitWidth="35.0"><Image url="@../assets/icon-raast.png" /></ImageView></graphic>
+                        </Button>
+                    </HBox>
+
+                    <VBox spacing="15.0" styleClass="services-container">
+                        <Label text="Services &amp; Payments" textFill="#1a2130">
+                            <font><Font name="System Bold" size="18.0" /></font>
+                        </Label>
+                        <Pagination fx:id="servicesPagination" prefHeight="180.0" />
+                    </VBox>
                 </VBox>
-            </VBox>
-        </ScrollPane>
-    </center>
-</BorderPane>
+            </ScrollPane>
+        </center>
+    </BorderPane>
+
+    <Button styleClass="help-btn" text="Help" StackPane.alignment="BOTTOM_RIGHT">
+        <graphic><ImageView fitHeight="16.0" fitWidth="16.0"><Image url="@../assets/icon-chat.png" /></ImageView></graphic>
+        <StackPane.margin><Insets bottom="30.0" right="30.0" /></StackPane.margin>
+    </Button>
+</StackPane>

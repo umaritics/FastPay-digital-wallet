@@ -63,3 +63,96 @@
     -fx-text-fill: #cc0000;
     -fx-background-radius: 8px;
 }
+
+/* Quick Action White Cards */
+.quick-action-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-text-fill: #1A2130;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);
+    -fx-cursor: hand;
+    -fx-content-display: TOP; /* Puts the icon above the text */
+}
+
+.quick-action-card:hover {
+    -fx-background-color: #f8fafc;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 15, 0, 0, 6);
+    -fx-translate-y: -2px; /* Slight lift effect on hover */
+}
+
+/* Sidebar Icon Buttons */
+.sidebar-icon-btn {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+    -fx-cursor: hand;
+}
+.sidebar-icon-btn:hover {
+    -fx-background-color: #2b3648;
+    -fx-background-radius: 10px;
+}
+
+/* Quick Action White Cards */
+.quick-action-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-text-fill: #1A2130;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+    -fx-content-display: TOP; /* Puts the icon above the text */
+    -fx-graphic-text-gap: 10px;
+}
+.quick-action-card:hover {
+    -fx-background-color: #f8fafc;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);
+}
+
+/* Force Pagination to use Dots and hide the numbers */
+.pagination .pagination-control {
+    -fx-background-color: transparent;
+}
+.pagination .number-button {
+    -fx-text-fill: transparent;
+    -fx-background-color: #cbd5e1;
+    -fx-background-radius: 50%;
+    -fx-min-width: 10px;
+    -fx-min-height: 10px;
+    -fx-max-width: 10px;
+    -fx-max-height: 10px;
+    -fx-padding: 0;
+}
+.pagination .number-button:selected {
+    -fx-background-color: #4da6ff;
+}
+
+/* The Border Box for Services */
+.services-container {
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);
+}
+
+/* Custom Help Button Pill */
+.help-btn {
+    -fx-background-color: #1A2130;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20px;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 4);
+}
+.help-btn:hover {
+    -fx-background-color: #2b3648;
+}
