@@ -43,7 +43,7 @@
 
                             <VBox spacing="5.0">
                                 <Label text="Email" textFill="#b0b8c4" />
-                                <TextField fx:id="loginEmailInput" promptText="Enter your email" text="umar@gmail.com styleClass="input-field" />
+                                <TextField fx:id="loginEmailInput" promptText="Enter your email" text="umar@gmail.com" styleClass="input-field" />
                             </VBox>
 
                             <VBox spacing="5.0">

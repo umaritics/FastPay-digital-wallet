@@ -27,6 +27,14 @@ public class Main extends Application {
 
         stage.setTitle("FastPay - Digital Wallet");
         stage.setScene(scene);
+
+        // Add application icon
+        try {
+            javafx.scene.image.Image appIcon = new javafx.scene.image.Image(Main.class.getResourceAsStream("assets/fastpay-icon.jpeg")); // Change filename if your square FP logo is named differently
+            stage.getIcons().add(appIcon);
+        } catch (Exception e) {
+            System.out.println("Could not load app icon.");
+        }
         stage.show();
     }
 

@@ -13,6 +13,14 @@
     -fx-padding: 5 0 5 0;
     -fx-font-size: 14px;
 }
+.dialog-input-field {
+    -fx-background-color: transparent;
+    -fx-border-color: #2b3648;
+    -fx-border-width: 0 0 2px 0;
+    -fx-text-fill: white;
+    -fx-padding: 5 0 5 0;
+    -fx-font-size: 14px;
+}
 .input-field:focused {
     -fx-border-color: #4da6ff;
 }
@@ -155,4 +163,29 @@
 }
 .help-btn:hover {
     -fx-background-color: #2b3648;
+}
+
+/* Custom Dialog Box Styling */
+.custom-dialog {
+    -fx-background-color: #f4f7f9;
+    -fx-font-family: "System";
+}
+
+/* The top header section of the dialog */
+.custom-dialog .header-panel {
+    -fx-background-color: #1A2130;
+}
+
+/* The text inside the top header */
+.custom-dialog .header-panel .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+/* The labels next to the text fields */
+.custom-dialog .content.label {
+    -fx-text-fill: #1A2130;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
 }

@@ -112,7 +112,7 @@
                         <Button styleClass="quick-action-card" text="QuickPay" prefWidth="130.0" prefHeight="130.0">
                             <graphic><ImageView fitHeight="35.0" fitWidth="35.0"><Image url="@../assets/icon-qr.png" /></ImageView></graphic>
                         </Button>
-                        <Button styleClass="quick-action-card" text="Raast" prefWidth="130.0" prefHeight="130.0">
+                        <Button styleClass="quick-action-card" text="Raast Payments" prefWidth="130.0" prefHeight="130.0">
                             <graphic><ImageView fitHeight="35.0" fitWidth="35.0"><Image url="@../assets/icon-raast.png" /></ImageView></graphic>
                         </Button>
                     </HBox>

@@ -6,6 +6,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -27,13 +28,14 @@ public class DashboardController {
     @FXML private Label greetingLabel;
     @FXML private Label totalBalanceLabel;
     @FXML private Label generalBalanceLabel;
+    @FXML private Button toggleBalanceBtn;
     @FXML private HBox partitionsContainer;
     @FXML private Pagination servicesPagination;
 
     private User currentUser;
     private String token;
     private List<String> partitionNames = new ArrayList<>(); // To store names for the dropdown
-
+    private boolean isBalanceHidden = false;
     // Service names for the pagination block
     private final String[] allServices = {
             "Mobile\nTop Up", "Pay Bills", "Bill Split", "Pay\nMerchant",
@@ -61,33 +63,55 @@ public class DashboardController {
             servicesPagination.setPageCount(2);
             servicesPagination.setPageFactory(this::createServicePage);
         }
+        if (toggleBalanceBtn != null) {
+            toggleBalanceBtn.setOnAction(e -> togglePrivacyMode());
+        }
+    }
+    // PRIVACY TOGGLE LOGIC
+    private void togglePrivacyMode() {
+        isBalanceHidden = !isBalanceHidden;
+
+        // Optional: Swap the eye icon if you have an 'icon-eye-closed.png'
+        try {
+            String iconName = isBalanceHidden ? "icon-eye-closed.png" : "icon-eye.png";
+            ImageView icon = new ImageView(new Image(getClass().getResourceAsStream("/org/example/fastpay/assets/" + iconName)));
+            icon.setFitHeight(20.0); icon.setFitWidth(20.0);
+            toggleBalanceBtn.setGraphic(icon);
+        } catch (Exception ignored) {}
+
+        // Reload the UI to apply the masks
+        loadWalletData();
     }
 
-    // Creates 6 square buttons with icons per page
     private Node createServicePage(int pageIndex) {
-        HBox pageBox = new HBox(15.0); // 15px gap between buttons
+        HBox pageBox = new HBox(15.0);
         pageBox.setAlignment(Pos.CENTER);
 
-        int startIndex = pageIndex * 6; // 6 items per page now
+        int startIndex = pageIndex * 6;
         int endIndex = Math.min(startIndex + 6, allServices.length);
 
         for (int i = startIndex; i < endIndex; i++) {
-            Button serviceBtn = new Button(allServices[i]);
+            String serviceName = allServices[i];
+            Button serviceBtn = new Button(serviceName);
             serviceBtn.getStyleClass().add("quick-action-card");
-
-            // Make them perfectly square
             serviceBtn.setPrefWidth(110.0);
             serviceBtn.setPrefHeight(110.0);
 
-            // Add a placeholder image for the icon.
-            // Save your downloaded PNGs as service-0.png, service-1.png, etc.
+            // Format the string: "Mobile Top Up" -> "icon-mobile-top-up.png"
+            String formattedFileName = "icon-" + serviceName.toLowerCase().replaceAll("\\s+", "-") + ".png";
+
             try {
-                ImageView icon = new ImageView(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/example/fastpay/assets/icon-placeholder.png")));
+                // Tries to load the specific icon, falls back to placeholder if you haven't downloaded it yet
+                java.io.InputStream stream = getClass().getResourceAsStream("/org/example/fastpay/assets/" + formattedFileName);
+                if (stream == null) {
+                    stream = getClass().getResourceAsStream("/org/example/fastpay/assets/icon-placeholder.png");
+                }
+                ImageView icon = new ImageView(new Image(stream));
                 icon.setFitHeight(30.0);
                 icon.setFitWidth(30.0);
                 serviceBtn.setGraphic(icon);
             } catch (Exception e) {
-                System.out.println("Icon missing for: " + allServices[i]);
+                System.out.println("Could not load icon for: " + serviceName);
             }
 
             pageBox.getChildren().add(serviceBtn);
@@ -101,7 +125,6 @@ public class DashboardController {
         double totalBalance = 0.0;
 
         JSONArray partitions = DatabaseService.getUserPartitions(currentUser.getId(), token);
-        System.out.println("DEBUG - Partitions: " + partitions.toString());
 
         for (int i = 0; i < partitions.length(); i++) {
             JSONObject partition = partitions.getJSONObject(i);
@@ -110,31 +133,47 @@ public class DashboardController {
             boolean isGeneral = partition.optBoolean("is_general", false);
 
             totalBalance += balance;
-            partitionNames.add(name); // Add to list for the dropdown
+            partitionNames.add(name);
+
+            // Apply Privacy Masking
+            String displayBalance = isBalanceHidden ? "Rs. * * * * *" : String.format("Rs. %,.2f", balance);
 
             if (isGeneral) {
-                generalBalanceLabel.setText(String.format("Rs. %,.2f", balance));
+                generalBalanceLabel.setText(displayBalance);
             } else {
-                VBox card = createPartitionCard(name, balance);
+                VBox card = createPartitionCard(name, balance, displayBalance);
                 partitionsContainer.getChildren().add(card);
             }
         }
-        totalBalanceLabel.setText(String.format("Rs. %,.2f", totalBalance));
+
+        String displayTotal = isBalanceHidden ? "Rs. * * * * *" : String.format("Rs. %,.2f", totalBalance);
+        totalBalanceLabel.setText(displayTotal);
     }
 
-    private VBox createPartitionCard(String name, double balance) {
+    // BULLETPROOF PARTITION CARD
+    private VBox createPartitionCard(String name, double rawBalance, String displayBalance) {
         VBox card = new VBox();
-        card.setPrefWidth(140.0);
+
+        // Locked Dimensions
+        card.setPrefSize(150.0, 85.0);
+        card.setMinSize(150.0, 85.0);
+        card.setMaxSize(150.0, 85.0);
+
+        card.setAlignment(Pos.CENTER_LEFT);
         card.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;");
-        card.setPadding(new Insets(15.0));
+        card.setPadding(new Insets(10.0, 15.0, 10.0, 15.0));
         card.setSpacing(5.0);
 
+        // Name Label (Using inline CSS to guarantee rendering)
         Label nameLabel = new Label(name);
-        nameLabel.setTextFill(javafx.scene.paint.Color.web("#1a2130"));
-        nameLabel.setFont(Font.font("System", FontWeight.BOLD, 14.0));
+        nameLabel.setStyle("-fx-text-fill: #1a2130; -fx-font-weight: bold; -fx-font-size: 14px;");
+        nameLabel.setWrapText(true);
+        nameLabel.setMinHeight(Control.USE_PREF_SIZE); // Forbids JavaFX from squishing the text to 0 height
 
-        Label balanceLabel = new Label(String.format("Rs. %,.2f", balance));
-        balanceLabel.setTextFill(javafx.scene.paint.Color.web("#4a5568"));
+        // Balance Label
+        Label balanceLabel = new Label(displayBalance);
+        balanceLabel.setStyle("-fx-text-fill: #4a5568; -fx-font-size: 13px;");
+        balanceLabel.setMinHeight(Control.USE_PREF_SIZE);
 
         card.getChildren().addAll(nameLabel, balanceLabel);
         return card;
@@ -142,28 +181,30 @@ public class DashboardController {
 
     @FXML
     protected void openCreatePartitionDialog() {
-        // Custom Dialog Box
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("New Virtual Partition");
         dialog.setHeaderText("Create and fund a new partition");
 
-        // Set the button types
         ButtonType createButtonType = new ButtonType("Create", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(createButtonType, ButtonType.CANCEL);
 
-        // Grid for inputs
         GridPane grid = new GridPane();
         grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+        grid.setVgap(15); // Slightly more vertical breathing room
+        grid.setPadding(new Insets(20, 20, 10, 20));
 
         TextField nameField = new TextField();
         nameField.setPromptText("Partition Name");
+        nameField.getStyleClass().add("dialog-input-field");
+
         TextField amountField = new TextField();
         amountField.setPromptText("0.00");
+        amountField.getStyleClass().add("input-field");
+
         ComboBox<String> sourceCombo = new ComboBox<>();
         sourceCombo.getItems().addAll(partitionNames);
         if (!partitionNames.isEmpty()) sourceCombo.getSelectionModel().selectFirst();
+        sourceCombo.setStyle("-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 5;");
 
         grid.add(new Label("Name:"), 0, 0);
         grid.add(nameField, 1, 0);
@@ -174,10 +215,26 @@ public class DashboardController {
 
         dialog.getDialogPane().setContent(grid);
 
+        // --- NEW: INJECT CSS INTO THE DIALOG ---
+        DialogPane dialogPane = dialog.getDialogPane();
+        try {
+            String cssPath = getClass().getResource("/org/example/fastpay/styles/application.css").toExternalForm();
+            dialogPane.getStylesheets().add(cssPath);
+        } catch (Exception ignored) {}
+
+        // Add a custom class to the dialog pane itself
+        dialogPane.getStyleClass().add("custom-dialog");
+
+        // Style the 'Create' button to match your primary blue buttons
+        Node createBtn = dialogPane.lookupButton(createButtonType);
+        if (createBtn != null) {
+            createBtn.getStyleClass().add("primary-btn");
+        }
+        // ---------------------------------------
+
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent() && result.get() == createButtonType) {
             String name = nameField.getText().trim();
-            // TODO: In future iterations, process the 'amountField' and 'sourceCombo' values to deduct/transfer funds.
             if (!name.isEmpty()) {
                 boolean success = DatabaseService.createPartition(currentUser.getId(), name, token);
                 if (success) {
