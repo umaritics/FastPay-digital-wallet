@@ -189,3 +189,47 @@
     -fx-font-weight: bold;
     -fx-font-size: 13px;
 }
+/* Slanted Fintech Card Background */
+.fintech-card {
+    -fx-background-color: linear-gradient(to bottom right, #1A2130 0%, #1A2130 55%, #2b3648 55%, #2b3648 60%, #1A2130 60%, #1A2130 65%, #3a4a63 65%, #3a4a63 70%, #1A2130 70%);
+    -fx-background-radius: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 15, 0, 0, 8);
+}
+
+/* Circular Action Buttons (FIXED) */
+.circle-btn {
+    -fx-background-color: white;
+    -fx-background-radius: 50%;
+    -fx-min-width: 45px;
+    -fx-min-height: 45px;
+    -fx-max-width: 45px;
+    -fx-max-height: 45px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+    -fx-alignment: center;
+    -fx-font-size: 18px; /* Makes the emojis larger and centered */
+    /* Removed GRAPHIC_ONLY so text emojis actually show up */
+}
+.circle-btn:hover {
+    -fx-background-color: #f4f7f9;
+}
+
+/* Bulletproof Status Colors (Prevents turning black on click) */
+.text-status-active {
+    -fx-text-fill: #4caf50 !important;
+}
+.text-status-frozen {
+    -fx-text-fill: #ff6b6b !important;
+}
+
+/* Custom Progress Bars */
+.custom-progress-bar {
+    -fx-accent: #1A2130; /* Dark blue fill */
+}
+.custom-progress-bar .track {
+    -fx-background-color: #e2e8f0;
+    -fx-background-radius: 10px;
+}
+.custom-progress-bar .bar {
+    -fx-background-radius: 10px;
+}

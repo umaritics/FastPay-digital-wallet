@@ -1,5 +1,6 @@
 package org.example.fastpay.services;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -135,6 +136,94 @@ public class DatabaseService {
             return response.statusCode() == 201; // 201 Created
         } catch (Exception e) {
             System.out.println("Error creating partition: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // FETCH USER'S ISSUED CARD
+    public static JSONObject getIssuedCard(String userId, String token) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(SUPABASE_URL + "/rest/v1/issued_cards?user_id=eq." + userId + "&select=*"))
+                    .header("apikey", API_KEY)
+                    .header("Authorization", "Bearer " + token)
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                JSONArray cards = new JSONArray(response.body());
+                if (cards.length() > 0) {
+                    return cards.getJSONObject(0); // Return the first (and only) card
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching card: " + e.getMessage());
+        }
+        return null; // Null means no card exists
+    }
+
+    // ORDER A NEW FASTPAY CARD
+    public static boolean orderCard(String userId, String address, String cardTier, String token) {
+        try {
+            java.util.Random random = new java.util.Random();
+
+            // Generate standard 16 digit card number based on tier
+            String prefix = cardTier.equals("Visa") ? "4242" : (cardTier.equals("Mastercard") ? "5555" : "6011");
+            String cardNumber = prefix + String.format("%04d", random.nextInt(10000)) +
+                    String.format("%04d", random.nextInt(10000)) +
+                    String.format("%04d", random.nextInt(10000));
+
+            String cvv = String.format("%03d", random.nextInt(1000));
+            java.time.LocalDate futureDate = java.time.LocalDate.now().plusYears(4);
+            String expiry = String.format("%02d/%02d", futureDate.getMonthValue(), futureDate.getYear() % 100);
+
+            JSONObject payload = new JSONObject();
+            payload.put("user_id", userId);
+            payload.put("card_number", cardNumber);
+            payload.put("cvv", cvv);
+            payload.put("expiry_date", expiry);
+            payload.put("delivery_address", address);
+            payload.put("card_tier", cardTier); // NEW COLUMN ADDED HERE
+            payload.put("status", "ACTIVE");
+            payload.put("daily_limit", 50000.00);
+
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(SUPABASE_URL + "/rest/v1/issued_cards"))
+                    .header("apikey", API_KEY)
+                    .header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json")
+                    .header("Prefer", "return=minimal")
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload.toString()))
+                    .build();
+
+            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+            return response.statusCode() == 201;
+        } catch (Exception e) {
+            System.out.println("Error ordering card: " + e.getMessage());
+            return false;
+        }
+    }
+    // PROCESS ATOMIC DEPOSIT
+    public static boolean processDeposit(String userId, double amount, String token) {
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("p_user_id", userId);
+            payload.put("p_amount", amount);
+
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    // Calling the RPC (Remote Procedure Call) endpoint
+                    .uri(java.net.URI.create(SUPABASE_URL + "/rest/v1/rpc/process_deposit"))
+                    .header("apikey", API_KEY)
+                    .header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json")
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload.toString()))
+                    .build();
+
+            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+            return response.statusCode() == 200;
+        } catch (Exception e) {
+            System.out.println("Error processing deposit: " + e.getMessage());
             return false;
         }
     }

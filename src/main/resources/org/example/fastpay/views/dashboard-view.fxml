@@ -115,6 +115,9 @@
                         <Button styleClass="quick-action-card" text="Raast Payments" prefWidth="130.0" prefHeight="130.0">
                             <graphic><ImageView fitHeight="35.0" fitWidth="35.0"><Image url="@../assets/icon-raast.png" /></ImageView></graphic>
                         </Button>
+                        <Button onAction="#openCardManagement" styleClass="quick-action-card" text="Manage Card" prefWidth="130.0" prefHeight="130.0">
+                            <graphic><ImageView fitHeight="35.0" fitWidth="35.0"><Image url="@../assets/icon-ATM-card.png" /></ImageView></graphic>
+                        </Button>
                     </HBox>
 
                     <VBox spacing="15.0" styleClass="services-container">
