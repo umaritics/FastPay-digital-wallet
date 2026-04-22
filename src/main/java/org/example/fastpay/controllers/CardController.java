@@ -2,7 +2,9 @@ package org.example.fastpay.controllers;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.example.fastpay.models.User;
@@ -131,14 +133,28 @@ public class CardController {
 
     @FXML
     protected void handleFreezeToggle() {
-        cardStatusLabel.getStyleClass().removeAll("text-status-active", "text-status-frozen");
+        String newStatus = freezeToggleBtn.isSelected() ? "FROZEN" : "ACTIVE";
 
-        if (freezeToggleBtn.isSelected()) {
-            cardStatusLabel.setText("FROZEN");
-            cardStatusLabel.getStyleClass().add("text-status-frozen");
+        // Create a payload with ONLY the status
+        org.json.JSONObject payload = new org.json.JSONObject();
+        payload.put("status", newStatus);
+
+        // Pass it to our unified method
+        boolean success = DatabaseService.updateCardData(currentUser.getId(), payload, token);
+
+        if (success) {
+            cardStatusLabel.getStyleClass().removeAll("text-status-active", "text-status-frozen");
+            if (newStatus.equals("FROZEN")) {
+                cardStatusLabel.setText("FROZEN");
+                cardStatusLabel.getStyleClass().add("text-status-frozen");
+            } else {
+                cardStatusLabel.setText("ACTIVE");
+                cardStatusLabel.getStyleClass().add("text-status-active");
+            }
         } else {
-            cardStatusLabel.setText("ACTIVE");
-            cardStatusLabel.getStyleClass().add("text-status-active");
+            freezeToggleBtn.setSelected(!freezeToggleBtn.isSelected());
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to update card status.");
+            alert.show();
         }
     }
 
@@ -185,6 +201,93 @@ public class CardController {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    @FXML
+    protected void openCardSettings() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Advanced Card Settings");
+        dialog.setHeaderText("Manage your FastPay Card security and limits.");
+
+        ButtonType saveButtonType = new ButtonType("Save Changes", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(15);
+        grid.setVgap(20);
+        grid.setPadding(new Insets(20, 20, 10, 20));
+
+        // PIN Change
+        PasswordField pinField = new PasswordField();
+        pinField.setPromptText("Enter new 4-digit PIN");
+        pinField.getStyleClass().add("input-field-dark");
+
+        // Daily Limit
+        TextField limitField = new TextField();
+        limitField.setText(String.valueOf(currentCard.optDouble("daily_limit", 50000.00)));
+        limitField.getStyleClass().add("input-field-dark");
+        limitField.setTextFormatter(new TextFormatter<>(change -> {
+            // Allows empty string, or digits with at most one decimal point
+            if (change.getControlNewText().matches("\\d*\\.?\\d*")) {
+                return change;
+            }
+            return null; // Rejects the keystroke if it's a letter or a minus sign
+        }));
+
+        // Toggles
+        CheckBox onlineToggle = new CheckBox("Enable Online Transactions");
+        onlineToggle.setSelected(currentCard.optBoolean("online_payments", true));
+        onlineToggle.setStyle("-fx-text-fill: #1a2130; -fx-font-weight: bold;");
+
+        CheckBox tapToggle = new CheckBox("Enable NFC (Tap & Pay)");
+        tapToggle.setSelected(currentCard.optBoolean("tap_and_pay", true));
+        tapToggle.setStyle("-fx-text-fill: #1a2130; -fx-font-weight: bold;");
+
+        grid.add(new Label("Card PIN:"), 0, 0);
+        grid.add(pinField, 1, 0);
+        grid.add(new Label("Daily Limit (PKR):"), 0, 1);
+        grid.add(limitField, 1, 1);
+        grid.add(onlineToggle, 0, 2, 2, 1);
+        grid.add(tapToggle, 0, 3, 2, 1);
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Inject Dialog CSS
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStyleClass().add("custom-dialog");
+        try {
+            dialogPane.getStylesheets().add(getClass().getResource("/org/example/fastpay/styles/application.css").toExternalForm());
+        } catch (Exception ignored) {
+        }
+
+        java.util.Optional<ButtonType> result = dialog.showAndWait();
+        if (result.isPresent() && result.get() == saveButtonType) {
+            try {
+                // Construct a payload with ALL the settings
+                org.json.JSONObject payload = new org.json.JSONObject();
+
+                String newPin = pinField.getText().trim();
+                if (!newPin.isEmpty()) {
+                    payload.put("pin", newPin);
+                }
+
+                payload.put("daily_limit", Double.parseDouble(limitField.getText().trim()));
+                payload.put("online_payments", onlineToggle.isSelected());
+                payload.put("tap_and_pay", tapToggle.isSelected());
+
+                // Pass it to the EXACT SAME unified method
+                boolean success = DatabaseService.updateCardData(currentUser.getId(), payload, token);
+
+                if (success) {
+                    checkCardStatus(); // Refresh UI
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to securely update card settings.");
+                    alert.show();
+                }
+            } catch (NumberFormatException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid limit amount entered.");
+                alert.show();
+            }
         }
     }
 }

@@ -107,6 +107,12 @@
                                     </ToggleButton>
                                     <Label text="Reveal" textFill="#4a5568"><font><Font size="12.0" /></font></Label>
                                 </VBox>
+                                <VBox alignment="CENTER" spacing="5.0">
+                                    <ToggleButton styleClass="circle-btn" onAction="#openCardSettings" text="⚙">
+                                        <tooltip><Tooltip text="More Settings" /></tooltip>
+                                    </ToggleButton>
+                                    <Label text="More" textFill="#4a5568"><font><Font size="12.0" /></font></Label>
+                                </VBox>
                             </HBox>
                         </VBox>
                     </HBox>

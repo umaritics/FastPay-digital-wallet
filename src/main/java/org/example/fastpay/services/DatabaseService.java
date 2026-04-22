@@ -114,26 +114,27 @@ public class DatabaseService {
         return new org.json.JSONArray(); // Return empty array on failure
     }
 
-    // CREATE NEW PARTITION
-    public static boolean createPartition(String userId, String name, String token) {
+    // CREATE NEW PARTITION (ATOMIC TRANSFER)
+    public static boolean createPartition(String userId, String name, String sourceId, double amount, String token) {
         try {
-            JSONObject payload = new JSONObject();
-            payload.put("user_id", userId);
-            payload.put("name", name);
-            payload.put("balance", 0.00); // Always starts at 0
-            payload.put("is_general", false);
+            org.json.JSONObject payload = new org.json.JSONObject();
+            payload.put("p_user_id", userId);
+            payload.put("p_name", name);
+            payload.put("p_source_id", sourceId);
+            payload.put("p_amount", amount);
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(SUPABASE_URL + "/rest/v1/wallet_partitions"))
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(SUPABASE_URL + "/rest/v1/rpc/create_partition_with_transfer"))
                     .header("apikey", API_KEY)
                     .header("Authorization", "Bearer " + token)
                     .header("Content-Type", "application/json")
-                    .header("Prefer", "return=minimal")
-                    .POST(HttpRequest.BodyPublishers.ofString(payload.toString()))
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload.toString()))
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            return response.statusCode() == 201; // 201 Created
+            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            // Supabase RPC returns 200 OK on success, and 400 Bad Request if our "Insufficient Funds" exception triggers
+            return response.statusCode() == 200;
         } catch (Exception e) {
             System.out.println("Error creating partition: " + e.getMessage());
             return false;
@@ -226,5 +227,90 @@ public class DatabaseService {
             System.out.println("Error processing deposit: " + e.getMessage());
             return false;
         }
+    }
+    // UNIFIED ADVANCED CARD UPDATE (Handles Status, Limits, PIN, and Toggles)
+    public static boolean updateCardData(String userId, org.json.JSONObject payload, String token) {
+        try {
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(SUPABASE_URL + "/rest/v1/issued_cards?user_id=eq." + userId))
+                    .header("apikey", API_KEY)
+                    .header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json")
+                    .header("Prefer", "return=minimal")
+                    .method("PATCH", java.net.http.HttpRequest.BodyPublishers.ofString(payload.toString()))
+                    .build();
+
+            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+            return response.statusCode() == 204;
+        } catch (Exception e) {
+            System.out.println("Error updating card: " + e.getMessage());
+            return false;
+        }
+    }
+    // TRANSFER FUNDS BETWEEN PARTITIONS
+    public static boolean transferFunds(String userId, String sourceId, String destId, double amount, String token) {
+        try {
+            org.json.JSONObject payload = new org.json.JSONObject();
+            payload.put("p_user_id", userId);
+            payload.put("p_source_id", sourceId);
+            payload.put("p_dest_id", destId);
+            payload.put("p_amount", amount);
+
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(SUPABASE_URL + "/rest/v1/rpc/transfer_between_partitions"))
+                    .header("apikey", API_KEY)
+                    .header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json")
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload.toString()))
+                    .build();
+
+            return client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString()).statusCode() == 200;
+        } catch (Exception e) {
+            System.out.println("Transfer Error: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // DELETE PARTITION (WITH SAFE SWEEP)
+    public static boolean deletePartition(String userId, String partitionId, String token) {
+        try {
+            org.json.JSONObject payload = new org.json.JSONObject();
+            payload.put("p_user_id", userId);
+            payload.put("p_partition_id", partitionId);
+
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(SUPABASE_URL + "/rest/v1/rpc/delete_partition_sweep"))
+                    .header("apikey", API_KEY)
+                    .header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json")
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload.toString()))
+                    .build();
+
+            return client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString()).statusCode() == 200;
+        } catch (Exception e) {
+            System.out.println("Delete Error: " + e.getMessage());
+            return false;
+        }
+    }
+    // FETCH TRANSACTION HISTORY
+    public static org.json.JSONArray getTransactions(String userId, String token) {
+        try {
+            // Fetch ordered by created_at DESC (newest first)
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(SUPABASE_URL + "/rest/v1/transactions?user_id=eq." + userId + "&order=created_at.desc"))
+                    .header("apikey", API_KEY)
+                    .header("Authorization", "Bearer " + token)
+                    .GET()
+                    .build();
+
+            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                return new org.json.JSONArray(response.body());
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching transactions: " + e.getMessage());
+        }
+        return new org.json.JSONArray(); // Return empty array on failure
     }
 }

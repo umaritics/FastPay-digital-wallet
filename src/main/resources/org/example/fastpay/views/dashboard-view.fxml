@@ -103,7 +103,7 @@
                     </VBox>
 
                     <HBox spacing="20.0" alignment="CENTER">
-                        <Button styleClass="quick-action-card" text="Add Money" prefWidth="130.0" prefHeight="130.0">
+                        <Button onAction="#openAddMoneyPopup" styleClass="quick-action-card" text="Add Money" prefWidth="130.0" prefHeight="130.0">
                             <graphic><ImageView fitHeight="35.0" fitWidth="35.0"><Image url="@../assets/icon-add.png" /></ImageView></graphic>
                         </Button>
                         <Button styleClass="quick-action-card" text="Send Money" prefWidth="130.0" prefHeight="130.0">

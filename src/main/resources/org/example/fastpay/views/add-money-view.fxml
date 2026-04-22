@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="750.0" prefWidth="1100.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.fastpay.controllers.AddMoneyController">
+
+    <left>
+        <VBox alignment="TOP_CENTER" prefWidth="80.0" spacing="20.0" style="-fx-background-color: #1A2130;" BorderPane.alignment="CENTER">
+            <padding><Insets bottom="20.0" top="30.0" /></padding>
+            <Button onAction="#goBackToDashboard" styleClass="sidebar-icon-btn">
+                <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-home.png" /></ImageView></graphic>
+                <tooltip><Tooltip text="Home" /></tooltip>
+            </Button>
+            <Region VBox.vgrow="ALWAYS" />
+        </VBox>
+    </left>
+
+    <center>
+        <VBox alignment="CENTER" style="-fx-background-color: #f4f7f9;">
+            <VBox spacing="20.0" maxWidth="500.0" style="-fx-background-color: white; -fx-padding: 40; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 8);">
+
+                <HBox alignment="CENTER">
+                    <ImageView fitHeight="35.0" preserveRatio="true"><Image url="@../assets/fastpay-logo.png" /></ImageView>
+                </HBox>
+
+                <Label text="Top-up Wallet" textFill="#1a2130"><font><Font name="System Bold" size="24.0" /></font></Label>
+                <Label text="Enter your external funding card details. We support Visa, Mastercard, and PayPak." textFill="#4a5568" wrapText="true" />
+
+                <VBox spacing="5.0">
+                    <Label text="Amount (PKR)" textFill="#1a2130"><font><Font name="System Bold" size="13.0" /></font></Label>
+                    <TextField fx:id="amountInput" promptText="e.g. 5000" styleClass="input-field-dark" style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <Label text="Cardholder Name" textFill="#1a2130"><font><Font name="System Bold" size="13.0" /></font></Label>
+                    <TextField fx:id="nameInput" promptText="Name on card" styleClass="input-field-dark" />
+                </VBox>
+
+                <VBox spacing="5.0">
+                    <Label text="Card Number" textFill="#1a2130"><font><Font name="System Bold" size="13.0" /></font></Label>
+                    <HBox alignment="CENTER_LEFT" styleClass="input-field-dark" style="-fx-padding: 0 10 0 0;">
+                        <TextField fx:id="cardNumberInput" promptText="0000 0000 0000 0000" style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS" />
+                        <ImageView fx:id="networkIcon" fitHeight="20.0" preserveRatio="true" />
+                    </HBox>
+                </VBox>
+
+                <HBox spacing="15.0">
+                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                        <Label text="Expiry" textFill="#1a2130"><font><Font name="System Bold" size="13.0" /></font></Label>
+                        <TextField fx:id="expiryInput" promptText="MM/YY" styleClass="input-field-dark" />
+                    </VBox>
+                    <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                        <Label text="CVV" textFill="#1a2130"><font><Font name="System Bold" size="13.0" /></font></Label>
+                        <PasswordField fx:id="cvvInput" promptText="***" styleClass="input-field-dark" />
+                    </VBox>
+                </HBox>
+
+                <Label fx:id="statusLabel" textFill="#ff6b6b" wrapText="true" />
+
+                <Button text="Process Secure Payment" onAction="#handlePayment" styleClass="primary-btn" maxWidth="Infinity">
+                    <VBox.margin><Insets top="10.0" /></VBox.margin>
+                </Button>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

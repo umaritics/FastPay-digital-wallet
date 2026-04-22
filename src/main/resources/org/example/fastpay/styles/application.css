@@ -233,3 +233,31 @@
 .custom-progress-bar .bar {
     -fx-background-radius: 10px;
 }
+/* Input fields for white backgrounds (Black text) */
+.input-field-dark {
+    -fx-background-color: transparent;
+    -fx-border-color: #cbd5e1;
+    -fx-border-width: 0 0 2px 0;
+    -fx-text-fill: #1a2130;
+    -fx-font-size: 14px;
+    -fx-padding: 8 0 8 0;
+}
+.input-field-dark:focused {
+    -fx-border-color: #4da6ff;
+}
+
+/* Big Selection Cards for Add Money Screen */
+.selection-card {
+    -fx-background-color: white;
+    -fx-background-radius: 15px;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 15px;
+    -fx-padding: 30px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 5);
+}
+.selection-card:hover {
+    -fx-background-color: #f8fafc;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 20, 0, 0, 8);
+    -fx-translate-y: -3px;
+}

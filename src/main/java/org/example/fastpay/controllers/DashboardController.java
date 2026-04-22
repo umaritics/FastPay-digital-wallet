@@ -8,9 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.example.fastpay.models.User;
@@ -34,8 +32,7 @@ public class DashboardController {
 
     private User currentUser;
     private String token;
-    private List<String> partitionNames = new ArrayList<>(); // To store names for the dropdown
-    private boolean isBalanceHidden = false;
+    private java.util.LinkedHashMap<String, String> partitionMap = new java.util.LinkedHashMap<>();    private boolean isBalanceHidden = false;
     // Service names for the pagination block
     private final String[] allServices = {
             "Mobile\nTop Up", "Pay Bills", "Bill Split", "Pay\nMerchant",
@@ -121,19 +118,21 @@ public class DashboardController {
 
     private void loadWalletData() {
         partitionsContainer.getChildren().clear();
-        partitionNames.clear();
         double totalBalance = 0.0;
 
         JSONArray partitions = DatabaseService.getUserPartitions(currentUser.getId(), token);
 
         for (int i = 0; i < partitions.length(); i++) {
             JSONObject partition = partitions.getJSONObject(i);
+            String id = partition.getString("id"); // Get the Database UUID
             String name = partition.optString("name", "Unnamed");
             double balance = partition.optDouble("balance", 0.0);
             boolean isGeneral = partition.optBoolean("is_general", false);
 
             totalBalance += balance;
-            partitionNames.add(name);
+
+            // Map the visual name to the database ID!
+            partitionMap.put(name, id);
 
             // Apply Privacy Masking
             String displayBalance = isBalanceHidden ? "Rs. * * * * *" : String.format("Rs. %,.2f", balance);
@@ -141,7 +140,8 @@ public class DashboardController {
             if (isGeneral) {
                 generalBalanceLabel.setText(displayBalance);
             } else {
-                VBox card = createPartitionCard(name, balance, displayBalance);
+                // We now pass the 'id' as the first parameter
+                VBox card = createPartitionCard(id, name, balance, displayBalance);
                 partitionsContainer.getChildren().add(card);
             }
         }
@@ -150,32 +150,47 @@ public class DashboardController {
         totalBalanceLabel.setText(displayTotal);
     }
 
-    // BULLETPROOF PARTITION CARD
-    private VBox createPartitionCard(String name, double rawBalance, String displayBalance) {
+    private VBox createPartitionCard(String partitionId, String name, double rawBalance, String displayBalance) {
         VBox card = new VBox();
-
-        // Locked Dimensions
         card.setPrefSize(150.0, 85.0);
         card.setMinSize(150.0, 85.0);
         card.setMaxSize(150.0, 85.0);
-
-        card.setAlignment(Pos.CENTER_LEFT);
         card.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;");
         card.setPadding(new Insets(10.0, 15.0, 10.0, 15.0));
         card.setSpacing(5.0);
 
-        // Name Label (Using inline CSS to guarantee rendering)
+        // Header HBox (Name + Menu)
+        HBox header = new HBox();
+        header.setAlignment(Pos.CENTER_LEFT);
+
         Label nameLabel = new Label(name);
         nameLabel.setStyle("-fx-text-fill: #1a2130; -fx-font-weight: bold; -fx-font-size: 14px;");
         nameLabel.setWrapText(true);
-        nameLabel.setMinHeight(Control.USE_PREF_SIZE); // Forbids JavaFX from squishing the text to 0 height
+        nameLabel.setMaxWidth(100.0);
+        nameLabel.setMinHeight(Control.USE_PREF_SIZE);
 
-        // Balance Label
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // Context Menu (Three Dots)
+        MenuButton menuButton = new MenuButton("");
+        menuButton.setStyle("-fx-background-color: transparent; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0;");
+
+        MenuItem topUpItem = new MenuItem("Top Up");
+        topUpItem.setOnAction(e -> openTopUpDialog(partitionId, name));
+
+        MenuItem deleteItem = new MenuItem("Delete");
+        deleteItem.setStyle("-fx-text-fill: #ff6b6b;");
+        deleteItem.setOnAction(e -> handleDeletePartition(partitionId, name));
+
+        menuButton.getItems().addAll(topUpItem, deleteItem);
+        header.getChildren().addAll(nameLabel, spacer, menuButton);
+
         Label balanceLabel = new Label(displayBalance);
         balanceLabel.setStyle("-fx-text-fill: #4a5568; -fx-font-size: 13px;");
         balanceLabel.setMinHeight(Control.USE_PREF_SIZE);
 
-        card.getChildren().addAll(nameLabel, balanceLabel);
+        card.getChildren().addAll(header, balanceLabel);
         return card;
     }
 
@@ -195,15 +210,22 @@ public class DashboardController {
 
         TextField nameField = new TextField();
         nameField.setPromptText("Partition Name");
-        nameField.getStyleClass().add("dialog-input-field");
+        nameField.getStyleClass().add("input-field-dark");
 
         TextField amountField = new TextField();
         amountField.setPromptText("0.00");
-        amountField.getStyleClass().add("input-field");
+        amountField.getStyleClass().add("input-field-dark");
+        amountField.setTextFormatter(new TextFormatter<>(change -> {
+            // Allows empty string, or digits with at most one decimal point
+            if (change.getControlNewText().matches("\\d*\\.?\\d*")) {
+                return change;
+            }
+            return null; // Rejects the keystroke if it's a letter or a minus sign
+        }));
 
         ComboBox<String> sourceCombo = new ComboBox<>();
-        sourceCombo.getItems().addAll(partitionNames);
-        if (!partitionNames.isEmpty()) sourceCombo.getSelectionModel().selectFirst();
+        sourceCombo.getItems().addAll(partitionMap.keySet()); // Load names from the Map
+        if (!partitionMap.isEmpty()) sourceCombo.getSelectionModel().select("General");
         sourceCombo.setStyle("-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 5;");
 
         grid.add(new Label("Name:"), 0, 0);
@@ -235,10 +257,24 @@ public class DashboardController {
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent() && result.get() == createButtonType) {
             String name = nameField.getText().trim();
-            if (!name.isEmpty()) {
-                boolean success = DatabaseService.createPartition(currentUser.getId(), name, token);
+            String amountStr = amountField.getText().trim();
+
+            // Retrieve the hidden UUID based on the selected name
+            String sourcePartitionId = partitionMap.get(sourceCombo.getValue());
+
+            double initialBalance = Double.parseDouble(amountField.getText().trim());
+            if (initialBalance <= 0) {
+                new Alert(Alert.AlertType.ERROR, "Amount must be greater than zero.").show();
+                return; // Stop execution
+            }
+
+            if (!name.isEmpty() && sourcePartitionId != null) {
+                boolean success = DatabaseService.createPartition(currentUser.getId(), name, sourcePartitionId, initialBalance, token);
                 if (success) {
-                    loadWalletData();
+                    loadWalletData(); // UI refreshes showing the deducted source and the new partition!
+                } else {
+                    Alert error = new Alert(Alert.AlertType.ERROR, "Insufficient funds in the source partition or network error.");
+                    error.show();
                 }
             }
         }
@@ -300,6 +336,159 @@ public class DashboardController {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    protected void openAddMoneyPopup() {
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Top-up Wallet");
+        dialog.setHeaderText("Choose your funding method");
+
+        // 1. Create a Custom Layout for the center of the Dialog
+        javafx.scene.layout.HBox contentBox = new javafx.scene.layout.HBox(30);
+        contentBox.setAlignment(javafx.geometry.Pos.CENTER);
+        contentBox.setPadding(new javafx.geometry.Insets(30, 40, 30, 40));
+
+        // 2. Create the Big Bank Button
+        Button bankBtn = new Button("Bank / Debit Card");
+        bankBtn.getStyleClass().add("quick-action-card"); // Reusing your dashboard style!
+        bankBtn.setPrefSize(180, 180);
+        try {
+            javafx.scene.image.ImageView bankIcon = new javafx.scene.image.ImageView(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/example/fastpay/assets/icon-bank-transfer.png")));
+            bankIcon.setFitWidth(50); bankIcon.setFitHeight(50);
+            bankBtn.setGraphic(bankIcon);
+            bankBtn.setContentDisplay(javafx.scene.control.ContentDisplay.TOP);
+        } catch (Exception ignored) {}
+
+        // 3. Create the Big QR Button
+        Button qrBtn = new Button("QR Payment Slip");
+        qrBtn.getStyleClass().add("quick-action-card");
+        qrBtn.setPrefSize(180, 180);
+        try {
+            javafx.scene.image.ImageView qrIcon = new javafx.scene.image.ImageView(new javafx.scene.image.Image(getClass().getResourceAsStream("/org/example/fastpay/assets/icon-qr-topup.png")));
+            qrIcon.setFitWidth(50); qrIcon.setFitHeight(50);
+            qrBtn.setGraphic(qrIcon);
+            qrBtn.setContentDisplay(javafx.scene.control.ContentDisplay.TOP);
+        } catch (Exception ignored) {}
+
+        contentBox.getChildren().addAll(bankBtn, qrBtn);
+
+        // 4. Inject the layout into the Dialog
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.setContent(contentBox);
+        dialogPane.getStyleClass().add("custom-dialog");
+        try {
+            dialogPane.getStylesheets().add(getClass().getResource("/org/example/fastpay/styles/application.css").toExternalForm());
+        } catch (Exception ignored) {}
+
+        // 5. Add a hidden Cancel button so the window 'X' still works
+        dialogPane.getButtonTypes().add(ButtonType.CANCEL);
+        javafx.scene.Node closeBtn = dialogPane.lookupButton(ButtonType.CANCEL);
+        closeBtn.setVisible(false);
+        closeBtn.setManaged(false);
+
+        // 6. Handle Clicks manually to close the dialog and route
+        bankBtn.setOnAction(e -> {
+            dialog.setResult("BANK");
+            dialog.close();
+        });
+
+        qrBtn.setOnAction(e -> {
+            dialog.setResult("QR");
+            dialog.close();
+        });
+
+        // 7. Process the Result
+        java.util.Optional<String> result = dialog.showAndWait();
+
+        if (result.isPresent()) {
+            if (result.get().equals("BANK")) {
+                routeToScreen("views/add-money-view.fxml");
+            } else if (result.get().equals("QR")) {
+                System.out.println("Routing to QR Flow...");
+            }
+        }
+    }
+
+    // Helper method to keep window sizing consistent across routing
+    private void routeToScreen(String fxmlPath) {
+        try {
+            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource(fxmlPath));
+            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
+            scene.getStylesheets().add(org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm());
+
+            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            boolean isMax = stage.isMaximized();
+
+            stage.setScene(scene);
+
+            if (isMax) stage.setMaximized(true);
+            else { stage.setWidth(width); stage.setHeight(height); }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private void openTopUpDialog(String targetPartitionId, String targetPartitionName) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Top Up Partition");
+        dialog.setHeaderText("Transfer funds into: " + targetPartitionName);
+
+        ButtonType transferBtn = new ButtonType("Transfer", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(transferBtn, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(15);
+        grid.setPadding(new Insets(20, 20, 10, 20));
+
+        TextField amountField = new TextField();
+        amountField.setPromptText("Amount (Rs)");
+
+        ComboBox<String> sourceCombo = new ComboBox<>();
+        // Add all partitions except the one we are transferring TO
+        for (String pName : partitionMap.keySet()) {
+            if (!pName.equals(targetPartitionName)) sourceCombo.getItems().add(pName);
+        }
+        if (!sourceCombo.getItems().isEmpty()) sourceCombo.getSelectionModel().selectFirst();
+
+        grid.add(new Label("Fund From:"), 0, 0); grid.add(sourceCombo, 1, 0);
+        grid.add(new Label("Amount:"), 0, 1); grid.add(amountField, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        try { dialog.getDialogPane().getStylesheets().add(getClass().getResource("/org/example/fastpay/styles/application.css").toExternalForm()); } catch (Exception ignored) {}
+
+        Optional<ButtonType> result = dialog.showAndWait();
+        if (result.isPresent() && result.get() == transferBtn) {
+            String sourceId = partitionMap.get(sourceCombo.getValue());
+            try {
+                double amount = Double.parseDouble(amountField.getText().trim());
+                if (DatabaseService.transferFunds(currentUser.getId(), sourceId, targetPartitionId, amount, token)) {
+                    loadWalletData(); // Refresh UI instantly
+                } else {
+                    new Alert(Alert.AlertType.ERROR, "Insufficient funds or network error.").show();
+                }
+            } catch (NumberFormatException e) {
+                new Alert(Alert.AlertType.ERROR, "Invalid amount.").show();
+            }
+        }
+    }
+
+    private void handleDeletePartition(String partitionId, String partitionName) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Partition");
+        alert.setHeaderText("Are you sure you want to delete '" + partitionName + "'?");
+        alert.setContentText("Any remaining balance will be safely swept back into your General Partition.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            if (DatabaseService.deletePartition(currentUser.getId(), partitionId, token)) {
+                loadWalletData(); // UI refreshes, card disappears, general balance updates
+            } else {
+                new Alert(Alert.AlertType.ERROR, "Failed to delete partition.").show();
+            }
         }
     }
 }
