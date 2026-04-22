@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="TOP_CENTER" prefWidth="400.0" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 15, 0, 0, 8);" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.fastpay.controllers.QrInvoiceDialogController">
+    <padding><Insets bottom="30.0" left="30.0" right="30.0" top="20.0" /></padding>
+
+    <ImageView fitHeight="35.0" preserveRatio="true"><Image url="@../assets/fastpay-logo.png" /></ImageView>
+
+    <StackPane style="-fx-border-color: #cbd5e1; -fx-border-radius: 10; -fx-padding: 10;">
+        <ImageView fx:id="qrImageView" fitHeight="200.0" fitWidth="200.0" preserveRatio="true" />
+    </StackPane>
+
+    <VBox alignment="CENTER" spacing="5.0">
+        <Label fx:id="nameLabel" text="[RECIPIENT NAME]" textFill="#1a2130"><font><Font name="System Bold" size="20.0" /></font></Label>
+        <Label fx:id="accountIdLabel" text="[MASKED ACCOUNT ID]" textFill="#4a5568"><font><Font size="13.0" /></font></Label>
+    </VBox>
+
+    <VBox alignment="CENTER" spacing="5.0" style="-fx-background-color: #f8fafc; -fx-padding: 15; -fx-background-radius: 10;">
+        <Label fx:id="amountLabel" text="PKR [AMOUNT]" textFill="#1a2130"><font><Font name="System Bold" size="28.0" /></font></Label>
+        <Label fx:id="expiryLabel" text="Expiry: [DATE]" textFill="#ff6b6b"><font><Font size="13.0" /></font></Label>
+    </VBox>
+
+    <Button text="Close" onAction="#handleClose" styleClass="primary-btn" maxWidth="Infinity">
+        <VBox.margin><Insets top="10.0" /></VBox.margin>
+    </Button>
+</VBox>

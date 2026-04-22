@@ -116,6 +116,11 @@ public class DashboardController {
         return pageBox;
     }
 
+    @FXML
+    protected void handleRefresh() {
+        loadWalletData();
+    }
+
     private void loadWalletData() {
         partitionsContainer.getChildren().clear();
         double totalBalance = 0.0;
@@ -340,6 +345,37 @@ public class DashboardController {
     }
 
     @FXML
+    protected void openHistory() {
+        try {
+            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/history-view.fxml"));
+            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
+            String cssPath = org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
+
+            // 1. Get the current stage from any button on the screen
+            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
+
+            // 2. Capture current state BEFORE setting the scene
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            boolean isMax = stage.isMaximized();
+
+            // 3. Set the new scene
+            stage.setScene(scene);
+
+            // 4. Reapply the state
+            if (isMax) {
+                stage.setMaximized(true);
+            } else {
+                stage.setWidth(width);
+                stage.setHeight(height);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     protected void openAddMoneyPopup() {
         Dialog<String> dialog = new Dialog<>();
         dialog.setTitle("Top-up Wallet");
@@ -406,7 +442,7 @@ public class DashboardController {
             if (result.get().equals("BANK")) {
                 routeToScreen("views/add-money-view.fxml");
             } else if (result.get().equals("QR")) {
-                System.out.println("Routing to QR Flow...");
+                generateQRSplash();
             }
         }
     }
@@ -472,6 +508,84 @@ public class DashboardController {
                 }
             } catch (NumberFormatException e) {
                 new Alert(Alert.AlertType.ERROR, "Invalid amount.").show();
+            }
+        }
+    }
+    private void generateQRSplash() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("QR Payment Slip");
+        dialog.setHeaderText("Generate a secure payment request");
+
+        ButtonType generateBtn = new ButtonType("Generate Slip", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(generateBtn, ButtonType.CANCEL);
+
+        VBox content = new VBox(15);
+        content.setAlignment(javafx.geometry.Pos.CENTER);
+        content.setPadding(new javafx.geometry.Insets(20));
+
+        Label instruction = new Label("Enter amount to request (PKR):");
+        TextField amountField = new TextField();
+        amountField.setPromptText("e.g. 1500");
+        amountField.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-alignment: center;");
+
+        amountField.setTextFormatter(new TextFormatter<>(change ->
+                change.getControlNewText().matches("\\d*\\.?\\d*") ? change : null));
+
+        content.getChildren().addAll(instruction, amountField);
+        dialog.getDialogPane().setContent(content);
+
+        try { dialog.getDialogPane().getStylesheets().add(getClass().getResource("/org/example/fastpay/styles/application.css").toExternalForm()); } catch (Exception ignored) {}
+
+        java.util.Optional<ButtonType> result = dialog.showAndWait();
+        if (result.isPresent() && result.get() == generateBtn) {
+            try {
+                double amount = Double.parseDouble(amountField.getText().trim());
+                if (amount <= 0) throw new NumberFormatException();
+
+                // 1. FINTECH ARCHITECTURE: Calculate and Store Expiry Date (24 hours)
+                java.time.Instant expiryInstant = java.time.Instant.now().plus(java.time.Duration.ofHours(24));
+                String invoiceId = DatabaseService.createQrInvoice(currentUser.getId(), amount, expiryInstant, token);
+
+                if (invoiceId != null) {
+                    String paymentUrl = "https://fastpay-six.vercel.app/pay?invoice=" + invoiceId;
+
+                    // 2. Generate QR
+                    com.google.zxing.qrcode.QRCodeWriter qrCodeWriter = new com.google.zxing.qrcode.QRCodeWriter();
+                    com.google.zxing.common.BitMatrix bitMatrix = qrCodeWriter.encode(paymentUrl, com.google.zxing.BarcodeFormat.QR_CODE, 250, 250);
+                    java.awt.image.BufferedImage bufferedImage = com.google.zxing.client.j2se.MatrixToImageWriter.toBufferedImage(bitMatrix);
+                    javafx.scene.image.Image qrImage = javafx.embed.swing.SwingFXUtils.toFXImage(bufferedImage, null);
+
+                    // 3. SECURE MASKING: Get General partition ID and create IBAN style mask
+                    String generalPartitionId = partitionMap.get("General");
+
+                    // Fallback just in case the ID is unusually short or null
+                    if (generalPartitionId == null || generalPartitionId.length() < 4) {
+                        generalPartitionId = "0000000000000000";
+                    }
+
+                    String maskedId = "PK** **** **** **** **" + generalPartitionId.substring(generalPartitionId.length() - 4);
+
+                    // 4. LOAD CUSTOM FINTECH INVOICE DIALOG
+                    javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/qr-invoice-dialog.fxml"));                    javafx.scene.Parent dialogContent = fxmlLoader.load();
+                    QrInvoiceDialogController controller = fxmlLoader.getController();
+
+                    // 5. Populate the Controller
+                    controller.setData(qrImage, currentUser.getEmail().split("@")[0].toUpperCase(), maskedId, amount, expiryInstant);
+
+                    // 6. Show the Undecorated Modern Dialog
+                    javafx.stage.Stage dialogStage = new javafx.stage.Stage();
+                    dialogStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+                    dialogStage.initStyle(javafx.stage.StageStyle.UNDECORATED);
+
+                    javafx.scene.Scene scene = new javafx.scene.Scene(dialogContent);
+                    dialogStage.setScene(scene);
+                    dialogStage.showAndWait();
+
+                } else {
+                    new Alert(Alert.AlertType.ERROR, "Network error generating invoice.").show();
+                }
+            } catch (Exception e) {
+                new Alert(Alert.AlertType.ERROR, "Error: " + e.getMessage()).show();
             }
         }
     }

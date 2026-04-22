@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="750.0" prefWidth="1100.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.fastpay.controllers.HistoryController">
+
+    <left>
+        <VBox alignment="TOP_CENTER" prefWidth="80.0" spacing="20.0" style="-fx-background-color: #1A2130;" BorderPane.alignment="CENTER">
+            <padding><Insets bottom="20.0" top="30.0" /></padding>
+            <Button onAction="#goBackToDashboard" styleClass="sidebar-icon-btn">
+                <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-home.png" /></ImageView></graphic>
+                <tooltip><Tooltip text="Home" /></tooltip>
+            </Button>
+            <Button onAction="#openCardManagement" styleClass="sidebar-icon-btn">
+                <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-profile.png" /></ImageView></graphic>
+                <tooltip><Tooltip text="Card Management" /></tooltip>
+            </Button>
+            <Button styleClass="sidebar-icon-btn" style="-fx-background-color: #2b3648;">
+                <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-history.png" /></ImageView></graphic>
+                <tooltip><Tooltip text="History" /></tooltip>
+            </Button>
+            <Region VBox.vgrow="ALWAYS" />
+        </VBox>
+    </left>
+
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: #f4f7f9; -fx-background: #f4f7f9;">
+            <VBox alignment="TOP_CENTER" style="-fx-padding: 40;">
+
+                <VBox maxWidth="850.0" spacing="25.0">
+                    <HBox alignment="CENTER_LEFT" spacing="15.0">
+                        <ImageView fitHeight="40.0" preserveRatio="true"><Image url="@../assets/fastpay-logo-whitebg.png" /></ImageView>
+                        <Label text="Financial Ledger" textFill="#1a2130"><font><Font name="System Bold" size="28.0" /></font></Label>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button text="Export PDF" styleClass="primary-btn" />
+                    </HBox>
+
+                    <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: white; -fx-padding: 15 25; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 3);">
+                        <Label text="Filter by:" textFill="#4a5568"><font><Font name="System Bold" size="14.0" /></font></Label>
+                        <ComboBox fx:id="timeFilterCombo" prefWidth="150.0" style="-fx-background-color: #f4f7f9; -fx-border-color: #cbd5e1; -fx-border-radius: 5;" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="transactionCountLabel" text="0 Transactions" textFill="#a0aec0" />
+                    </HBox>
+
+                    <VBox fx:id="transactionsContainer" spacing="10.0" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 5);" />
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

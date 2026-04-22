@@ -9,11 +9,8 @@ import java.net.http.HttpResponse;
 
 public class DatabaseService {
 
-    // FIXED: The base URL should only be the domain name
     private static final String SUPABASE_URL = "https://kkmcepagifexhdeodyog.supabase.co";
 
-    // NOTE: Make sure this is your 'anon public' key from Supabase Settings -> API.
-    // Standard Supabase anon keys usually start with "eyJ...".
     private static final String API_KEY = "sb_publishable_Ebi_9rInKDfL_vP1i3IWvg_BnMUUWFY";
 
     private static final HttpClient client = HttpClient.newHttpClient();
@@ -312,5 +309,35 @@ public class DatabaseService {
             System.out.println("Error fetching transactions: " + e.getMessage());
         }
         return new org.json.JSONArray(); // Return empty array on failure
+    }
+    // GENERATE QR INVOICE
+    // GENERATE QR INVOICE (With Expiry)
+    public static String createQrInvoice(String userId, double amount, java.time.Instant expiryInstant, String token) {
+        try {
+            org.json.JSONObject payload = new org.json.JSONObject();
+            payload.put("creator_id", userId);
+            payload.put("amount", amount);
+            // Format the Instant to the required TIMESTAMPTZ ISO string
+            payload.put("expires_at", java.time.format.DateTimeFormatter.ISO_INSTANT.format(expiryInstant));
+
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(SUPABASE_URL + "/rest/v1/qr_invoices"))
+                    .header("apikey", API_KEY)
+                    .header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json")
+                    .header("Prefer", "return=representation")
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload.toString()))
+                    .build();
+
+            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 201) {
+                org.json.JSONArray array = new org.json.JSONArray(response.body());
+                return array.getJSONObject(0).getString("id");
+            }
+        } catch (Exception e) {
+            System.out.println("QR Invoice Error: " + e.getMessage());
+        }
+        return null;
     }
 }
