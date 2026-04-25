@@ -111,9 +111,55 @@ public class DashboardController {
                 System.out.println("Could not load icon for: " + serviceName);
             }
 
+            serviceBtn.setOnAction(event -> handleServiceClick(serviceName));
+
             pageBox.getChildren().add(serviceBtn);
         }
         return pageBox;
+    }
+
+
+    private void handleServiceClick(String serviceName) {
+        String fxmlFile = "";
+
+        // 1. Map the service name to the correct FXML file
+        switch (serviceName) {
+            case "Mobile\nTop Up":
+                fxmlFile = "views/mobile-topup-view.fxml";
+                break;
+            case "Pay Bills":
+                fxmlFile = "views/pay-bills-view.fxml";
+                break;
+            case "Donations":
+                fxmlFile = "views/donations-view.fxml";
+                break;
+            case "M-Tag\nTop-up":
+                fxmlFile = "views/mtag-view.fxml";
+                break;
+            default:
+                // If a button is clicked that doesn't have a screen yet
+                System.out.println("Screen not implemented yet for: " + serviceName);
+                // Optional: Show a quick JavaFX Alert here saying "Coming Soon!"
+                return;
+        }
+
+        // 2. Perform the Scene Switch
+        try {
+            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource(fxmlFile));
+            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
+
+            // Re-apply your global stylesheet
+            scene.getStylesheets().add(org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm());
+
+            // Grab the current window (Stage) from the active layout
+            // Note: Replace 'servicesPagination' with whatever the ID of your pagination/container is
+            javafx.stage.Stage stage = (javafx.stage.Stage) servicesPagination.getScene().getWindow();
+            stage.setScene(scene);
+
+        } catch (Exception e) {
+            System.out.println("CRITICAL: Failed to load screen for " + serviceName);
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -282,96 +328,6 @@ public class DashboardController {
                     error.show();
                 }
             }
-        }
-    }
-
-    @FXML
-    protected void handleLogout() {
-        SessionManager.getInstance().logout();
-        try {
-            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/auth-view.fxml"));
-            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
-            String cssPath = org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm();
-            scene.getStylesheets().add(cssPath);
-
-            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
-
-            double width = stage.getWidth();
-            double height = stage.getHeight();
-            boolean isMax = stage.isMaximized();
-
-            stage.setScene(scene);
-
-            if (isMax) {
-                stage.setMaximized(true);
-            } else {
-                stage.setWidth(width);
-                stage.setHeight(height);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    protected void openCardManagement() {
-        try {
-            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/card-management-view.fxml"));
-            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
-            String cssPath = org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm();
-            scene.getStylesheets().add(cssPath);
-
-            // 1. Get the current stage from any button on the screen
-            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
-
-            // 2. Capture current state BEFORE setting the scene
-            double width = stage.getWidth();
-            double height = stage.getHeight();
-            boolean isMax = stage.isMaximized();
-
-            // 3. Set the new scene
-            stage.setScene(scene);
-
-            // 4. Reapply the state
-            if (isMax) {
-                stage.setMaximized(true);
-            } else {
-                stage.setWidth(width);
-                stage.setHeight(height);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    protected void openHistory() {
-        try {
-            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/history-view.fxml"));
-            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
-            String cssPath = org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm();
-            scene.getStylesheets().add(cssPath);
-
-            // 1. Get the current stage from any button on the screen
-            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
-
-            // 2. Capture current state BEFORE setting the scene
-            double width = stage.getWidth();
-            double height = stage.getHeight();
-            boolean isMax = stage.isMaximized();
-
-            // 3. Set the new scene
-            stage.setScene(scene);
-
-            // 4. Reapply the state
-            if (isMax) {
-                stage.setMaximized(true);
-            } else {
-                stage.setWidth(width);
-                stage.setHeight(height);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -603,6 +559,220 @@ public class DashboardController {
             } else {
                 new Alert(Alert.AlertType.ERROR, "Failed to delete partition.").show();
             }
+        }
+    }
+
+    //---------------------------------------------------------
+    // Routing Functions
+    //---------------------------------------------------------
+    @FXML
+    protected void handleLogout() {
+        SessionManager.getInstance().logout();
+        try {
+            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/auth-view.fxml"));
+            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
+            String cssPath = org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
+
+            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
+
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            boolean isMax = stage.isMaximized();
+
+            stage.setScene(scene);
+
+            if (isMax) {
+                stage.setMaximized(true);
+            } else {
+                stage.setWidth(width);
+                stage.setHeight(height);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    protected void openCardManagement() {
+        try {
+            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/card-management-view.fxml"));
+            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
+            String cssPath = org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
+
+            // 1. Get the current stage from any button on the screen
+            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
+
+            // 2. Capture current state BEFORE setting the scene
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            boolean isMax = stage.isMaximized();
+
+            // 3. Set the new scene
+            stage.setScene(scene);
+
+            // 4. Reapply the state
+            if (isMax) {
+                stage.setMaximized(true);
+            } else {
+                stage.setWidth(width);
+                stage.setHeight(height);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    protected void openHistory() {
+        try {
+            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/history-view.fxml"));
+            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
+            String cssPath = org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
+
+            // 1. Get the current stage from any button on the screen
+            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
+
+            // 2. Capture current state BEFORE setting the scene
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            boolean isMax = stage.isMaximized();
+
+            // 3. Set the new scene
+            stage.setScene(scene);
+
+            // 4. Reapply the state
+            if (isMax) {
+                stage.setMaximized(true);
+            } else {
+                stage.setWidth(width);
+                stage.setHeight(height);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    protected void openSendMoney() {
+        try {
+            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/send-money-view.fxml"));
+            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
+            String cssPath = org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
+
+            // 1. Get the current stage from any button on the screen
+            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
+
+            // 2. Capture current state BEFORE setting the scene
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            boolean isMax = stage.isMaximized();
+
+            // 3. Set the new scene
+            stage.setScene(scene);
+
+            // 4. Reapply the state
+            if (isMax) {
+                stage.setMaximized(true);
+            } else {
+                stage.setWidth(width);
+                stage.setHeight(height);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    protected void openRaast() {
+        try {
+            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/raast-view.fxml"));
+            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
+            String cssPath = org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
+
+            // 1. Get the current stage from any button on the screen
+            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
+
+            // 2. Capture current state BEFORE setting the scene
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            boolean isMax = stage.isMaximized();
+
+            // 3. Set the new scene
+            stage.setScene(scene);
+
+            // 4. Reapply the state
+            if (isMax) {
+                stage.setMaximized(true);
+            } else {
+                stage.setWidth(width);
+                stage.setHeight(height);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    protected void openMobile() {
+        try {
+            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/mobile-topup-view.fxml"));
+            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
+            String cssPath = org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
+
+            // 1. Get the current stage from any button on the screen
+            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
+
+            // 2. Capture current state BEFORE setting the scene
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            boolean isMax = stage.isMaximized();
+
+            // 3. Set the new scene
+            stage.setScene(scene);
+
+            // 4. Reapply the state
+            if (isMax) {
+                stage.setMaximized(true);
+            } else {
+                stage.setWidth(width);
+                stage.setHeight(height);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    @FXML
+    protected void openPayBill() {
+        try {
+            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/pay-bills-view.fxml"));
+            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
+            String cssPath = org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
+
+            // 1. Get the current stage from any button on the screen
+            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
+
+            // 2. Capture current state BEFORE setting the scene
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            boolean isMax = stage.isMaximized();
+
+            // 3. Set the new scene
+            stage.setScene(scene);
+
+            // 4. Reapply the state
+            if (isMax) {
+                stage.setMaximized(true);
+            } else {
+                stage.setWidth(width);
+                stage.setHeight(height);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

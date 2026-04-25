@@ -27,24 +27,31 @@ public class AuthController {
 
     @FXML
     public void initialize() {
-        // Bind the hidden password field and visible text field together
+        // 1. Password Visibility Toggle
         if (loginPasswordVisible != null && loginPasswordInput != null) {
             loginPasswordVisible.textProperty().bindBidirectional(loginPasswordInput.textProperty());
-
-            // Listen for clicks on the eye icon
             togglePasswordBtn.setOnAction(event -> {
                 if (togglePasswordBtn.isSelected()) {
-                    // Show password (hide dots, show text)
                     loginPasswordVisible.setVisible(true);
                     loginPasswordInput.setVisible(false);
-                    togglePasswordBtn.setText("🙈"); // Monkey covering eyes
+                    togglePasswordBtn.setText("🙈");
                 } else {
-                    // Hide password (show dots, hide text)
                     loginPasswordVisible.setVisible(false);
                     loginPasswordInput.setVisible(true);
-                    togglePasswordBtn.setText("👁"); // Eye
+                    togglePasswordBtn.setText("👁");
                 }
             });
+        }
+
+        // 2. Strict Phone Number Formatting (03 followed by up to 9 digits)
+        if (regPhoneInput != null) {
+            regPhoneInput.setTextFormatter(new TextFormatter<>(change -> {
+                String newText = change.getControlNewText();
+                if (newText.matches("^$|^0$|^03\\d{0,9}$")) {
+                    return change;
+                }
+                return null;
+            }));
         }
     }
 
@@ -111,7 +118,10 @@ public class AuthController {
             regErrorLabel.setText("Please fill in all required fields.");
             return;
         }
-
+        if (phone.length() != 11) {
+            regErrorLabel.setText("Phone number must be exactly 11 digits.");
+            return;
+        }
         regErrorLabel.setText("Creating account...");
         regErrorLabel.setStyle("-fx-text-fill: #4da6ff;");
 

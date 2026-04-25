@@ -33,7 +33,7 @@
 
                 <VBox maxWidth="850.0" spacing="25.0">
                     <HBox alignment="CENTER_LEFT" spacing="15.0">
-                        <ImageView fitHeight="40.0" preserveRatio="true"><Image url="@../assets/fastpay-logo-whitebg.png" /></ImageView>
+                        <ImageView fitHeight="55.0" preserveRatio="true"><Image url="@../assets/fastpay-logo.png" /></ImageView>
                         <Label text="Financial Ledger" textFill="#1a2130"><font><Font name="System Bold" size="28.0" /></font></Label>
                         <Region HBox.hgrow="ALWAYS" />
                         <Button text="Export PDF" styleClass="primary-btn" />

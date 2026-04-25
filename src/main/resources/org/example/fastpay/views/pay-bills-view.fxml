@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="750.0" prefWidth="1200.0" stylesheets="@../styles/application.css" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.fastpay.controllers.PayBillsController">
+
+    <left>
+        <VBox alignment="TOP_CENTER" prefWidth="80.0" spacing="20.0" style="-fx-background-color: #1A2130;" BorderPane.alignment="CENTER">
+            <padding><Insets bottom="20.0" top="30.0" /></padding>
+            <Button onAction="#goBackToDashboard" styleClass="sidebar-icon-btn">
+                <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-home.png" /></ImageView></graphic>
+            </Button>
+            <Region VBox.vgrow="ALWAYS" />
+        </VBox>
+    </left>
+
+    <center>
+        <VBox alignment="TOP_CENTER" style="-fx-background-color: #f4f7f9; -fx-padding: 40;">
+
+            <HBox alignment="TOP_CENTER" spacing="40.0" maxWidth="1300.0" VBox.vgrow="ALWAYS">
+
+                <VBox HBox.hgrow="ALWAYS" maxWidth="850.0" minWidth="600.0" spacing="25.0" VBox.vgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT" spacing="20.0">
+                        <Label text="Pay Bills &amp; Fees" textFill="#1a2130"><font><Font name="System Bold" size="28.0" /></font></Label>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <TextField fx:id="searchField" promptText="Search billers (e.g., Gas)..." prefWidth="250.0" styleClass="input-field-dark" style="-fx-font-size: 14px; -fx-background-radius: 20;"/>
+                    </HBox>
+
+                    <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-text-fill: black; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
+                        <FlowPane fx:id="billerGrid" hgap="15.0" vgap="15.0" alignment="TOP_LEFT" style="-fx-padding: 5;" />
+                    </ScrollPane>
+                </VBox>
+
+                <VBox maxWidth="400.0" minWidth="300.0" spacing="25.0" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 20; -fx-text-fill: black; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 5);">
+                    <Label text="Saved Bills" textFill="#1a2130"><font><Font name="System Bold" size="20.0" /></font></Label>
+                    <Label text="Quickly pay your monthly registered bills." textFill="#a0aec0" wrapText="true" style="-fx-font-size: 13px; -fx-margin-top: -15px;"/>
+
+                    <VBox fx:id="savedBillsContainer" spacing="15.0" />
+
+                    <Region VBox.vgrow="ALWAYS" />
+                    <Button text="+ Add New Biller" style="-fx-background-color: transparent; -fx-border-color: #cbd5e1; -fx-border-radius: 10; -fx-text-fill: #4a5568; -fx-font-weight: bold; -fx-cursor: hand;" prefWidth="Infinity" prefHeight="45.0" />
+                </VBox>
+
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

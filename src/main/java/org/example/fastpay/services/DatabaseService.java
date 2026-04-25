@@ -340,4 +340,54 @@ public class DatabaseService {
         }
         return null;
     }
+    // P2P TRANSFER (ATOMIC RPC)
+    public static org.json.JSONObject transferP2P(String senderId, String senderPartitionId, String receiverPhone, double amount, String token) {
+        try {
+            org.json.JSONObject payload = new org.json.JSONObject();
+            payload.put("p_sender_id", senderId);
+            payload.put("p_sender_partition_id", senderPartitionId);
+            payload.put("p_receiver_phone", receiverPhone);
+            payload.put("p_amount", amount);
+
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(SUPABASE_URL + "/rest/v1/rpc/transfer_p2p"))
+                    .header("apikey", API_KEY)
+                    .header("Authorization", "Bearer " + token)
+                    .header("Content-Type", "application/json")
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload.toString()))
+                    .build();
+
+            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+            // RPC returns 200 OK on success. We parse the returned JSON to get the Transaction ID.
+            if (response.statusCode() == 200) {
+                return new org.json.JSONObject(response.body());
+            } else {
+                System.out.println("Transfer Failed: " + response.body());
+            }
+        } catch (Exception e) {
+            System.out.println("P2P Transfer Error: " + e.getMessage());
+        }
+        return null;
+    }
+    // FETCH FASTPAY CONTACTS (Excluding the current user)
+    public static org.json.JSONArray getFastPayContacts(String currentUserId, String token) {
+        try {
+            // NEW: Added 'id' to select, and '&id=neq.' to filter out the logged-in user natively
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create(SUPABASE_URL + "/rest/v1/users?select=id,full_name,phone&id=neq." + currentUserId + "&limit=10"))
+                    .header("apikey", API_KEY)
+                    .header("Authorization", "Bearer " + token)
+                    .GET()
+                    .build();
+
+            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                return new org.json.JSONArray(response.body());
+            }
+        } catch (Exception e) {
+            System.out.println("Error fetching contacts: " + e.getMessage());
+        }
+        return new org.json.JSONArray();
+    }
 }

@@ -261,3 +261,32 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 20, 0, 0, 8);
     -fx-translate-y: -3px;
 }
+/* Network Square Buttons */
+.network-btn {
+    -fx-background-color: white;
+    -fx-border-color: #cbd5e1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-text-fill: #4a5568;
+}
+.network-btn:selected {
+    -fx-border-color: #4da6ff;
+    -fx-border-width: 2px;
+    -fx-background-color: #f0f8ff;
+}
+
+/* 3-Way Tabs */
+.tab-toggle-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #4a5568;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-background-radius: 8;
+    -fx-padding: 8 15 8 15;
+}
+.tab-toggle-btn:selected {
+    -fx-background-color: white;
+    -fx-text-fill: #1a2130;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}

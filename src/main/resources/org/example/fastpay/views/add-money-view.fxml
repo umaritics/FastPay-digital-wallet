@@ -24,7 +24,7 @@
             <VBox spacing="20.0" maxWidth="500.0" style="-fx-background-color: white; -fx-padding: 40; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 8);">
 
                 <HBox alignment="CENTER">
-                    <ImageView fitHeight="35.0" preserveRatio="true"><Image url="@../assets/fastpay-logo.png" /></ImageView>
+                    <ImageView fitHeight="55.0" preserveRatio="true"><Image url="@../assets/fastpay-logo.png" /></ImageView>
                 </HBox>
 
                 <Label text="Top-up Wallet" textFill="#1a2130"><font><Font name="System Bold" size="24.0" /></font></Label>
