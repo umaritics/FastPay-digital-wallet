@@ -775,4 +775,35 @@ public class DashboardController {
             e.printStackTrace();
         }
     }
+    @FXML
+    protected void openProfile() {
+        try {
+            javafx.fxml.FXMLLoader fxmlLoader = new javafx.fxml.FXMLLoader(org.example.fastpay.Main.class.getResource("views/profile-view.fxml"));
+            javafx.scene.Scene scene = new javafx.scene.Scene(fxmlLoader.load());
+            String cssPath = org.example.fastpay.Main.class.getResource("styles/application.css").toExternalForm();
+            scene.getStylesheets().add(cssPath);
+
+            // 1. Get the current stage from any button on the screen
+            javafx.stage.Stage stage = (javafx.stage.Stage) greetingLabel.getScene().getWindow();
+
+            // 2. Capture current state BEFORE setting the scene
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+            boolean isMax = stage.isMaximized();
+
+            // 3. Set the new scene
+            stage.setScene(scene);
+
+            // 4. Reapply the state
+            if (isMax) {
+                stage.setMaximized(true);
+            } else {
+                stage.setWidth(width);
+                stage.setHeight(height);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

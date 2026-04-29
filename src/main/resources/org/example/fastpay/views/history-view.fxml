@@ -15,7 +15,7 @@
                 <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-home.png" /></ImageView></graphic>
                 <tooltip><Tooltip text="Home" /></tooltip>
             </Button>
-            <Button onAction="#openCardManagement" styleClass="sidebar-icon-btn">
+            <Button onAction="#openProfile" styleClass="sidebar-icon-btn">
                 <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-profile.png" /></ImageView></graphic>
                 <tooltip><Tooltip text="Card Management" /></tooltip>
             </Button>

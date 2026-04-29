@@ -153,4 +153,5 @@ public class HistoryController {
             else { stage.setWidth(width); stage.setHeight(height); }
         } catch (Exception e) { e.printStackTrace(); }
     }
+
 }

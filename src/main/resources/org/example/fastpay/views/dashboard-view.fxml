@@ -21,7 +21,7 @@
                     <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-home.png" /></ImageView></graphic>
                     <tooltip><Tooltip text="Home" /></tooltip>
                 </Button>
-                <Button styleClass="sidebar-icon-btn">
+                <Button styleClass="sidebar-icon-btn" onAction="#openProfile">
                     <graphic><ImageView fitHeight="24.0" fitWidth="24.0"><Image url="@../assets/icon-profile.png" /></ImageView></graphic>
                     <tooltip><Tooltip text="Profile" /></tooltip>
                 </Button>
